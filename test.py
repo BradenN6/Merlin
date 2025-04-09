@@ -7,8 +7,8 @@ import yt
 from yt.frontends.ramses.field_handlers import RTFieldFileHandler
 import matplotlib.pyplot as plt
 
-from emission import EmissionLineInterpolator
-import galaxy_visualization
+from merlin.emission import EmissionLineInterpolator
+from merlin import galaxy_visualization
 
 filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
 
@@ -83,17 +83,6 @@ def _my_temperature(field, data):
     return pr/dn * mu * mH_RAMSES / kB_RAMSES
 
 
-# TODO see if it works in emission.py
-# Luminosity field
-# Cloudy Intensity obtained assuming height = 1cm
-# Return intensity values erg/s/cm**2
-# Multiply intensity at each pixel by volume of pixel -> luminosity
-def get_luminosity(line):
-   def _luminosity(field, data):
-      return data['gas', 'flux_' + line]*data['gas', 'volume']
-   return copy.deepcopy(_luminosity)
-
-
 #number density of hydrogen atoms
 def _my_H_nuclei_density(field, data):
     dn=data["ramses","Density"].in_cgs()
@@ -102,6 +91,7 @@ def _my_H_nuclei_density(field, data):
     mH_RAMSES=yt.YTArray(1.6600000e-24,"g") #defined by RAMSES in cooling_module.f90
 
     return dn*XH_RAMSES/mH_RAMSES
+
 
 def OII_ratio(field, data):
     # TODO lum or flux?
@@ -137,6 +127,7 @@ def _xHeIII(field, data):
         #'xHeIII' not in dir(ds.fields.ramses):
         return data['ramses', 'hydro_xHeIII']
 
+
 '''
 -------------------------------------------------------------------------------
 Load Simulation Data
@@ -153,7 +144,6 @@ ds.add_field(
     units="1/cm**3",
     force_override=True
 )
-
 
 ds.add_field(
     ("ramses","Pressure"),
@@ -226,12 +216,12 @@ ds.add_field(
 # Normalize by Density Squared Flag
 dens_normalized = True
 if dens_normalized: 
-    units = '1/cm**6'
+    flux_units = '1/cm**6'
 else:
-    units = '1'
+    flux_units = '1'
 
 # Instance of EmissionLineInterpolator for line list at filename
-line_list = os.path.join(os.getcwd(), 'nebular_lines_v2/linelist.dat')
+line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
 emission_interpolator = EmissionLineInterpolator(line_list, lines)
 
 # Add flux and luminosity fields for all lines in the list
@@ -242,15 +232,13 @@ for i, line in enumerate(lines):
             i, dens_normalized=dens_normalized
         ),
         sampling_type='cell',
-        units=units,
+        units=flux_units,
         force_override=True
     )
-    # TODO change get_line_emission to accept line not idx
 
     ds.add_field(
         ('gas', 'luminosity_' + line),
         function=emission_interpolator.get_luminosity(lines[i]),
-        #function=get_luminosity(lines[i]),
         sampling_type='cell',
         units='1/cm**3',
         force_override=True
@@ -271,8 +259,6 @@ star_ctr = viz.star_center(ad)
 sp = ds.sphere(star_ctr, (3000, "pc"))
 sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
 width = (1500, 'pc')
-
-sim_run = filename.split('/')[-1]
 
 field_list = [
     #('gas', 'temperature'),
@@ -324,24 +310,8 @@ viz.save_sim_info(ds)
 #                     weight_field_list, title_list, proj=True, slc=False)
 
 
-#viz.calc_luminosities(sp)
+viz.calc_luminosities(sp)
 
-'''
-viz.plot_cumulative_field(ds, sp, width, star_ctr, ('gas', 'luminosity_H1_6562.80A'),
-                              None, 'luminosity_H1_6562.80A', 'luminosity_H1_6562,80A_cumulative')
-
-p = viz.proj_plot(ds, sp, width, star_ctr, ('gas', 'flux_H1_6562.80A'), None)
-        
-plot_frb = p.frb
-p_img = np.array(plot_frb['gas', 'flux_H1_6562.80A'])
-
-dim1, dim2 = p_img.shape
-
-A_pt = (width[0] * 3.086e18 / dim1) * (width[0] * 3.086e18 / dim2)
-
-lum = np.sum(p_img * A_pt)
-print(lum)
-'''
 
 extrema = {('gas', 'my_temperature'): (1e3, 1e8),
            ('gas', 'my_H_nuclei_density'): (1e-4, 1e6)}
@@ -355,24 +325,6 @@ viz.phase_plot(ds, sp, x_field=('gas', 'my_temperature'),
                z_label=line_title.replace('_', ' ') + 
                       r' Luminosity [erg s$^{-1}$]')
 
-
-'''
-pix = sp[('gas', 'luminosity_H1_6562.80A')].value
-pix_sort = np.sort(pix, axis=None)[::-1]
-idxs = np.arange(0, len(pix_sort), 1)
-cum_val = np.cumsum(pix_sort) / np.sum(pix_sort)
-
-fig = plt.figure(figsize=(8, 6))
-plt.xlabel('Index')
-plt.ylabel('Cumulative Value')
-plt.title(f'Cumulative Sum')
-plt.plot(idxs, cum_val)
-plt.grid(True)
-plt.show()
-plt.close()
-'''
-
-# width 1500 pc
 
 
 
@@ -407,3 +359,5 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
                         y_label=r'H Nuclei Number Density [cm$^{-3}$]',
                         z_label=line_title.replace('_', ' ') + 
                             r' Flux [erg s$^{-1}$ cm$^{-2}$]')
+
+viz.spectra_driver(ds, 1000, 1e-25)

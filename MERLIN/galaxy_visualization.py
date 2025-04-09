@@ -3,7 +3,7 @@ import numpy as np
 import shutil
 import os
 import matplotlib.pyplot as plt
-import emission
+import merlin.emission
 import astropy
 import yt
 from yt.units import dimensions
@@ -895,7 +895,7 @@ class VisualizationManager:
         # Display spectra at redshifted wavelengths
         # lambda_obs = (1+z)*lambda_rest
         if redshift_wavelengths:
-            wavelengths = (1 + self.redshift) * np.array(wavelengths)
+            wavelengths = (1 + self.current_redshift) * np.array(wavelengths)
             pad *= 5
 
         line_widths = np.array(wavelengths) / resolving_power  # Angstroms
@@ -922,10 +922,10 @@ class VisualizationManager:
             ax1.set_xlabel(r'Wavelength [$\AA$]')
             if not linear:
                 ax1.set_ylabel(
-                    r'Log(Flux) [$erg\: s^{-1}\: cm^{-2} \: \AA^{-1}]$'
+                    r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]'
                 )
             else:
-                ax1.set_ylabel(r'Flux [$erg\: s^{-1}\: cm^{-2} \: \AA^{-1}]$')
+                ax1.set_ylabel(r'Flux [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]')
 
             flux_fname = figname + '_flux'
             plt.savefig(flux_fname)
@@ -951,10 +951,10 @@ class VisualizationManager:
             ax1.set_xlabel(r'Wavelength [$\AA$]')
             if not linear:
                 ax1.set_ylabel(
-                    r'Log(Luminosity) [$erg\: s^{-1} \: \AA^{-1}]$'
+                    r'Log(Luminosity) [erg s$^{-1}$ $\AA^{-1}$]'
                 )
             else:
-                ax1.set_ylabel(r'Luminosity [$erg\: s^{-1} \: \AA^{-1}]$')
+                ax1.set_ylabel(r'Luminosity [erg s$^{-1}$ $\AA^{-1}$]')
 
             lum_fname = figname + '_lum'
             plt.savefig(lum_fname)
@@ -965,8 +965,8 @@ class VisualizationManager:
             ax1.plot(wavelengths, np.log10(self.flux_arr), 'o')
             ax2.plot(wavelengths, np.log10(self.luminosities), 'o')
             ax2.set_xlabel(r'Wavelength [$\AA$]')
-            ax1.set_ylabel(r'Log(Flux) [$erg\: s^{-1}\: cm^{-2}$]')
-            ax2.set_ylabel(r'Log(Luminosity) [$erg\: s^{-1}$]')
+            ax1.set_ylabel(r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$]')
+            ax2.set_ylabel(r'Log(Luminosity) [erg s$^{-1}$]')
             plt.savefig(figname)
             plt.close()
 
