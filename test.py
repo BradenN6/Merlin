@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from merlin.emission import EmissionLineInterpolator
 from merlin import galaxy_visualization
 
-filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
+filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00353/info_00353.txt"
 
 lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A",
        "O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A","O3_5006.84A", 
@@ -287,7 +287,7 @@ title_list = [
     'Metallicity'
 ]
 
-
+'''
 for line in lines:
     if line == 'H1_6562.80A':
         line_title = r'H$\alpha$_6562.80A'
@@ -303,16 +303,17 @@ for line in lines:
     title_list.append(line_title.replace('_', ' ') + 
                       r' Luminosity [$erg\: s^{-1}$]')
     weight_field_list.append(None)
-
+'''
 
 viz.save_sim_info(ds)
-#viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
-#                     weight_field_list, title_list, proj=True, slc=False)
+viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
+                     weight_field_list, title_list, proj=True, slc=False)
 
 
-viz.calc_luminosities(sp)
+#viz.calc_luminosities(sp)
+#viz.save_sim_field_info(ds, sp)
 
-
+'''
 extrema = {('gas', 'my_temperature'): (1e3, 1e8),
            ('gas', 'my_H_nuclei_density'): (1e-4, 1e6)}
 
@@ -324,7 +325,7 @@ viz.phase_plot(ds, sp, x_field=('gas', 'my_temperature'),
                y_label=r'H Nuclei Number Density [cm$^{-3}$]', 
                z_label=line_title.replace('_', ' ') + 
                       r' Luminosity [erg s$^{-1}$]')
-
+'''
 
 
 
@@ -338,7 +339,7 @@ viz.phase_plot(ds, sp, x_field=('gas', 'my_temperature'),
 # normalize value in colorbar
 # min and max - gradient in yellow part 
 
-
+'''
 extrema = {('gas', 'my_temperature'): (1e3, 1e8),
            ('gas', 'my_H_nuclei_density'): (1e-4, 1e6)}
 
@@ -361,3 +362,4 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
                             r' Flux [erg s$^{-1}$ cm$^{-2}$]')
 
 viz.spectra_driver(ds, 1000, 1e-25)
+'''
