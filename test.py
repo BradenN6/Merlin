@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from merlin.emission import EmissionLineInterpolator
 from merlin import galaxy_visualization
 
-filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00353/info_00353.txt"
+filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
 
 lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A",
        "O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A","O3_5006.84A", 
@@ -93,9 +93,10 @@ def _my_H_nuclei_density(field, data):
     return dn*XH_RAMSES/mH_RAMSES
 
 
-def OII_ratio(field, data):
+def _OII_ratio(field, data):
     # TODO lum or flux?
-    return data['gas', 'luminosity_O2_3728.80A']/data['gas', 'luminosity_O2_3726.10A']
+    return data['gas', 'luminosity_O2_3728.80A']/data['gas',
+                                                      'luminosity_O2_3726.10A']
 
 
 def _pressure(field, data):
@@ -213,15 +214,19 @@ ds.add_field(
     force_override=True
 )
 
+
 # Normalize by Density Squared Flag
 dens_normalized = True
 if dens_normalized: 
     flux_units = '1/cm**6'
+    lum_units = '1/cm**3'
 else:
     flux_units = '1'
+    lum_units = 'cm**3'
 
 # Instance of EmissionLineInterpolator for line list at filename
-line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
+#line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
+line_list = os.path.join(os.getcwd(), 'data/linelist2.dat')
 emission_interpolator = EmissionLineInterpolator(line_list, lines)
 
 # Add flux and luminosity fields for all lines in the list
@@ -240,9 +245,20 @@ for i, line in enumerate(lines):
         ('gas', 'luminosity_' + line),
         function=emission_interpolator.get_luminosity(lines[i]),
         sampling_type='cell',
-        units='1/cm**3',
+        units=lum_units,
         force_override=True
     )
+
+
+ds.add_field(
+    ("gas","OII_ratio"),
+    function=_OII_ratio,
+    sampling_type="cell",
+    units="1",
+    force_override=True
+)
+# TODO
+
 
 ad = ds.all_data()
 print(ds.field_list)
@@ -266,7 +282,7 @@ field_list = [
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_temperature'),
     ('gas', 'ion_param'),
-    ('gas', 'metallicity'),
+    ('gas', 'metallicity')
 ]
 
 weight_field_list = [
@@ -287,6 +303,11 @@ title_list = [
     'Metallicity'
 ]
 
+field_list.append(('gas', 'flux_'  + 'H1_6562.80A'))
+title_list.append(r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+                  r' Flux [$erg\: s^{-1}\: cm^{-2}$]')
+weight_field_list.append(None)
+
 '''
 for line in lines:
     if line == 'H1_6562.80A':
@@ -299,10 +320,10 @@ for line in lines:
                       r' Flux [$erg\: s^{-1}\: cm^{-2}$]')
     weight_field_list.append(None)
 
-    field_list.append(('gas', 'luminosity_'  + line))
-    title_list.append(line_title.replace('_', ' ') + 
-                      r' Luminosity [$erg\: s^{-1}$]')
-    weight_field_list.append(None)
+    #field_list.append(('gas', 'luminosity_'  + line))
+    #title_list.append(line_title.replace('_', ' ') + 
+    #                  r' Luminosity [$erg\: s^{-1}$]')
+    #weight_field_list.append(None)
 '''
 
 viz.save_sim_info(ds)
@@ -363,3 +384,8 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
 
 viz.spectra_driver(ds, 1000, 1e-25)
 '''
+
+
+# TODO linear profile plots
+# annotate total emission/sum
+# TODO or density normalization
