@@ -262,6 +262,7 @@ ds.add_field(
 
 ad = ds.all_data()
 print(ds.field_list)
+print(ds.derived_field_list)
 
 
 '''
@@ -277,7 +278,7 @@ sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
 width = (1500, 'pc')
 
 field_list = [
-    #('gas', 'temperature'),
+    ('gas', 'temperature'),
     ('gas', 'density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_temperature'),
@@ -286,7 +287,7 @@ field_list = [
 ]
 
 weight_field_list = [
-    #('gas', 'my_H_nuclei_density'),
+    ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
@@ -295,7 +296,7 @@ weight_field_list = [
 ]
 
 title_list = [
-    #'Temperature [K]',
+    'Temperature [K]',
     r'Density [g cm$^{-3}$]',
     r'H Nuclei Number Density [cm$^{-3}$]',
     'My Temperature [K]',
@@ -308,7 +309,7 @@ title_list.append(r'H$\alpha$_6562.80A'.replace('_', ' ') +
                   r' Flux [$erg\: s^{-1}\: cm^{-2}$]')
 weight_field_list.append(None)
 
-'''
+
 for line in lines:
     if line == 'H1_6562.80A':
         line_title = r'H$\alpha$_6562.80A'
@@ -324,15 +325,40 @@ for line in lines:
     #title_list.append(line_title.replace('_', ' ') + 
     #                  r' Luminosity [$erg\: s^{-1}$]')
     #weight_field_list.append(None)
-'''
 
+'''
 viz.save_sim_info(ds)
 viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
                      weight_field_list, title_list, proj=True, slc=False)
 
 
-#viz.calc_luminosities(sp)
-#viz.save_sim_field_info(ds, sp)
+viz.calc_luminosities(sp)
+viz.save_sim_field_info(ds, sp)
+
+
+extrema = {('gas', 'my_temperature'): (1e3, 1e8),
+           ('gas', 'my_H_nuclei_density'): (1e-4, 1e6)}
+
+line_title = r'H$\alpha$_6562.80A'
+
+phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(ds, sp, x_field=('gas', 'my_temperature'),
+               y_field=('gas', 'my_H_nuclei_density'), z_field=('gas', 'flux_H1_6562.80A'),
+               extrema=extrema, x_label='Temperature [K]', 
+               y_label=r'H Nuclei Number Density [cm$^{-3}$]', 
+               z_label=line_title.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]')
+
+viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature'),
+                        y_field=('gas', 'my_H_nuclei_density'),
+                        z_field=('gas', 'flux_H1_6562.80A'),
+                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
+                        x_label='Temperature [K]',
+                        y_label=r'H Nuclei Number Density [cm$^{-3}$]',
+                        z_label=line_title.replace('_', ' ') + 
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]')
+
+viz.spectra_driver(ds, 1000, 1e-25)
+'''
 
 '''
 extrema = {('gas', 'my_temperature'): (1e3, 1e8),
@@ -384,8 +410,3 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
 
 viz.spectra_driver(ds, 1000, 1e-25)
 '''
-
-
-# TODO linear profile plots
-# annotate total emission/sum
-# TODO or density normalization
