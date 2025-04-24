@@ -538,7 +538,7 @@ class VisualizationManager:
         fig.colorbar(cax, cax=cbar_ax, orientation='vertical', label=z_label)
 
 
-        z_total = sp.quantities.total_quantity(z_field)
+        z_total = sp.quantities.total_quantity(z_field).value
         annotation_text = f'{z_label} Total: {z_total}'
         fig.text(0.95, 0.95, annotation_text, ha='right', va='top',
                  fontsize=12, color='black')
@@ -684,14 +684,29 @@ class VisualizationManager:
         TODO ad
         '''
 
+        #fields = [
+        #    ('gas', 'temperature'),
+        #    ('gas', 'density'),
+            #('gas', 'number_density'),
+        #    ('gas', 'my_H_nuclei_density'),
+        #    ('gas', 'my_temperature'),
+        #    ('gas', 'ion_param'),
+        #    ('gas', 'metallicity')
+        #]
+
         fields = [
             ('gas', 'temperature'),
             ('gas', 'density'),
-            #('gas', 'number_density'),
             ('gas', 'my_H_nuclei_density'),
             ('gas', 'my_temperature'),
             ('gas', 'ion_param'),
-            ('gas', 'metallicity')
+            ('gas', 'metallicity'),
+        #    ('gas', 'OII_ratio'),
+            ('ramses', 'xHI'),
+            ('ramses', 'xHII'),
+            ('ramses', 'xHeII'),
+            ('ramses', 'xHeIII'),
+            ('star', 'particle_mass')
         ]
 
         for line in self.lines:
@@ -705,11 +720,11 @@ class VisualizationManager:
             min = sp.min(field).value
             print(f'{field}_min: {min}')
             max = sp.max(field).value
-            print(f'{field}_min: {max}')
+            print(f'{field}_max: {max}')
             mean = sp.mean(field).value
-            print(f'{field}_min: {mean}')
+            print(f'{field}_mean: {mean}')
             agg = sp.quantities.total_quantity(field).value
-            print(f'{field}_min: {agg}')
+            print(f'{field}_agg: {agg}')
 
             field_info.append((min, max, mean, agg))
 
@@ -717,7 +732,8 @@ class VisualizationManager:
         file_path = os.path.join(self.directory, 
                                 f'{self.output_file}_field_info.txt')
         
-        stellar_mass = ad.quantities.total_quantity('star', 'particle_mass')
+        stellar_mass = \
+            ad.quantities.total_quantity(('star', 'particle_mass')).value
         
         with open(file_path, 'w') as file:
             for i, field in enumerate(fields):
@@ -778,7 +794,7 @@ class VisualizationManager:
         plt.grid(True)
         plt.savefig(
             os.path.join(self.directory,
-                         f'output_{self.output_file}_{fname}'), dpi=300
+                         f'output_{self.sim_run}_{fname}.png'), dpi=300
         )
         plt.close()
 
@@ -998,6 +1014,7 @@ class VisualizationManager:
         center (List, float): center (array of 3 values) in code units
         width (tuple, int and str): width in code units or formatted with 
             units, e.g. (1500, 'pc')
+        field: TODO
         gas_title (str): title for overlay plot, i.e.
             r'H$\alpha$ Flux [$erg\: s^{-1}\: cm^{-2}$]'
         gas_flag (bool): choose whether to plot gas overlay in addition
@@ -1012,8 +1029,9 @@ class VisualizationManager:
         '''
 
         redshift = self.current_redshift
+        lbox = width[0]
 
-        lims = lims_dict[field[1]]
+        #lims = lims_dict[field[1]]
 
         fname = os.path.join(self.directory, self.output_file + '_' +
                              str(width[0]) + width[1] + '_stellar_dist')
@@ -1031,10 +1049,11 @@ class VisualizationManager:
 
         # Create a ProjectionPlot
         p = yt.ProjectionPlot(ds, "z", field,
-                          width=(width, 'pc'),
+                          width=width,
                           data_source=sp,
                           buff_size=(2000, 2000),
                           center=center)
+        print(field)
 
         # Fixed Resolution Buffer
         p_frb = p.frb
@@ -1044,15 +1063,16 @@ class VisualizationManager:
         pop2_xyz = np.array(
             ds.arr(np.vstack([x_pos, y_pos, z_pos]),
                    "code_length").to("pc")).T
-        extent_dens = [-width/2, width/2, -width/2, width/2]
+        pop2_xyz = np.array(ds.arr(np.vstack([x_pos, y_pos, z_pos]), "code_length").to("pc")).T
+        extent_dens = [-lbox/2, lbox/2, -lbox/2, lbox/2]
         #gas_range = (20, 2e4)
-        norm1 = LogNorm(vmin=lims[0], vmax=lims[1])
+        #norm1 = LogNorm(vmin=lims[0], vmax=lims[1])
     
         stellar_mass_dens, _, _ = \
             np.histogram2d(pop2_xyz[:, 0], pop2_xyz[:, 1],
                            bins = star_bins,weights = star_mass,
-                           range = [[-width / 2, width / 2],
-                                    [-width / 2, width / 2],],
+                           range = [[-lbox / 2, lbox / 2],
+                                    [-lbox / 2, lbox / 2],],
         )
         stellar_mass_dens = stellar_mass_dens.T
         stellar_mass_dens = np.where(stellar_mass_dens <= 1, 0,
@@ -1112,8 +1132,8 @@ class VisualizationManager:
             ax.set_xlabel("X (pc)")
             ax.set_ylabel("Y (pc)")
             ax.set_title(gas_title + ' and Stellar Mass Density Distribution')
-            ax.set_xlim(-width / 2, width / 2)
-            ax.set_ylim(-width / 2, width / 2)
+            ax.set_xlim(-lbox / 2, lbox / 2)
+            ax.set_ylim(-lbox / 2, lbox / 2)
 
             plt.text(0.05, 0.05, f'z = {redshift:.5f}', color='white',
                      fontsize=9,
