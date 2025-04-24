@@ -12,7 +12,7 @@ from merlin import galaxy_visualization
 
 #filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
 filename = sys.argv[1]
-print(f'Line List Filepath = {filename}')
+#print(f'Line List Filepath = {filename}')
 
 lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A",
        "O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A","O3_5006.84A", 
