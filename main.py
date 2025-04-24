@@ -386,7 +386,7 @@ for line in lines:
                       r' Luminosity [erg s$^{-1}$]')
     weight_field_list.append(None)
 
-'''
+
 viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
                      weight_field_list, title_list, proj=True, slc=True)
 
@@ -422,7 +422,7 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
 viz.spectra_driver(ds, 1000, 1e-25)
 # TODO lum_lims
 
-'''
+
 line_title = r'H$\alpha$_6562.80A'
 
 # Cumulative Flux Plot
