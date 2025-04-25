@@ -381,14 +381,14 @@ for line in lines:
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]')
     weight_field_list.append(None)
 
-    field_list.append(('gas', 'luminosity_'  + line))
-    title_list.append(line_title.replace('_', ' ') + 
-                      r' Luminosity [erg s$^{-1}$]')
-    weight_field_list.append(None)
+    #field_list.append(('gas', 'luminosity_'  + line))
+    #title_list.append(line_title.replace('_', ' ') + 
+    #                  r' Luminosity [erg s$^{-1}$]')
+    #weight_field_list.append(None)
 
 
 viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
-                     weight_field_list, title_list, proj=True, slc=True)
+                     weight_field_list, title_list, proj=True, slc=False)
 
 
 

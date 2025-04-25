@@ -1,0 +1,53 @@
+# Merlin
+
+## Nebular Line Emission Diagnostics from Cosmological Simulations of 
+## Early Universe Galaxies.
+
+Author: Braden Nowicki
+Advisor: Dr. Massimo Ricotti
+
+Interface with Cloudy Photoionization Code data and RAMSES-RT Simulation
+data to create galaxy images and spectra in nebular emission lines.
+
+
+File Structure:
+---------------
+
+MERLIN
+|-- merlin/ : primary package for analysis and visualizations
+|   |-- __init__.py
+|   |-- emission.py : Generate line emission fields from a Cloudy-generated
+|                       linelist table.
+|   |-- galaxy_visualization.py : Visualization and analysis routines for
+|                       RAMSES-RT Simulations.
+|   |-- movies.py : generate movies from sequences of images.
+|   |-- tools.py : Suite of functions for performing analysis on data
+|                       output from many time slices.
+|   |-- linelists/ : Cloudy grid run-generated line list data.
+|   |   |       Parameter Space: minU, maxU, stepU, minN, maxN, stepN, minT,
+|   |   |           maxT, stepT
+|   |   |-- linelist.dat : -6.0 1.0 0.5 -1.0 6.0 0.5 3.0 6.0 0.1
+|   |   |-- linelist2.dat : -9.0 2.0 0.5 -4.0 7.0 0.5 1.0 8.0 0.2
+
+
+Dependencies:
+-->
+-->
+-->
+-->
+-->
+-->
+-->
+-->
+-->
+-->
+-->
+-->
+
+The Merlin is a small species of falcon from the Northern Hemisphere.
+The naming of this package is inspired by the Merlin's exceptionally sharp
+eyesight; we generate observational diagnostics from simulated distant,
+high-redshift galaxies. Birds are a bellwether of environmental decline;
+populations are down nearly 3 billion birds since 1970. Please consider
+supporting/adopting local efforts to safeguard birds, their migration,
+and their habitats.

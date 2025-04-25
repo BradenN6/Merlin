@@ -28,10 +28,11 @@ lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3
        "C3_1906.68A","C3_1908.73A","C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A",
        "Ne3_3967.47A","N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
-image_dir = '/Users/bnowicki/Documents/Scratch/movie_dir_stellar_dist_2/'
+#image_dir = '/Users/bnowicki/Documents/Scratch/movie_dir_stellar_dist_2/'
+image_dir = '/Users/bnowicki/Documents/Research/Ricotti/new_analysis/movie_dir/'
 image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_lims',
                   'output_*_1500pc_ion-param_proj', 'output_*_1500pc_ion-param_proj_lims',
-                  'output_*_1500pc_luminosity_H1_6562,80A_proj', 'output_*_1500pc_intensity_H1_6562,80A_slc',
+                  'output_*_1500pc_luminosity_H1_6562,80A_proj', 'output_*_1500pc_flux_H1_6562,80A_slc',
                   'output_*_1500pc_metallicity_proj', 'output_*_1500pc_metallicity_proj_lims',
                   'output_*_1500pc_number_density_proj', 'output_*_1500pc_number_density_proj_lims',
                   'output_*_1500pc_temperature_proj', 'output_*_1500pc_temperature_proj_lims',
@@ -40,12 +41,13 @@ image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_
                   'output_*_sim_spectra_redshifted', 'output_*_sim_spectra_redshifted_lum',
                   'output_*_sim_spectra_lims_lum', 'output_*_sim_spectra_lims',
                   'output_*_sim_spectra_redshifted_lims', 'output_*_sim_spectra_redshifted_lims_lum',
-                  'output_*_1500pc_stellar_dist', 'output_*_1500pc_stellar_dist_H1']
+                  'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase_profile']
+                  #'output_*_1500pc_stellar_dist', 'output_*_1500pc_stellar_dist_H1']
 
 for line in lines:
     line_pattern = line.replace('.', ',')
-    pattern =  'output_*_1500pc_intensity_' + line_pattern + '_proj'
-    pattern_lims = 'output_*_1500pc_intensity_' + line_pattern + '_proj_lims'
+    pattern =  'output_*_1500pc_flux_' + line_pattern + '_proj'
+    pattern_lims = 'output_*_1500pc_flux_' + line_pattern + '_proj_lims'
     image_patterns.append(pattern)
     image_patterns.append(pattern_lims)
 
