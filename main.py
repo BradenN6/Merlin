@@ -10,6 +10,28 @@ import matplotlib.pyplot as plt
 from merlin.emission import EmissionLineInterpolator
 from merlin import galaxy_visualization
 
+'''
+main.py
+
+Author: Braden Nowicki
+
+Braden Nowicki with Dr. Massimo Ricotti
+University of Maryland, College Park Astronomy Department
+
+Script to visualize RAMSES-RT Simulations of high-redshift galaxies in a 
+variety of metal lines.
+Ionization Parameter, Number Density, and Temperature for each pixel are input
+into an interpolator for each line; the interpolator is created via the
+module 'emission.py'. An EmissionLineInterpolator object is instantiated
+given a filepath for a Cloudy-generated line flux list/data table.
+
+'''
+
+# TODO docstrings
+# TODO change to use mytemperature
+# TODO new hydrofile versions
+
+
 #filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
 filename = sys.argv[1]
 #print(f'Line List Filepath = {filename}')
@@ -227,8 +249,8 @@ else:
 
 # Instance of EmissionLineInterpolator for line list at filename
 #line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
-# TODO altar for zaratan
-line_list = os.path.join(os.getcwd(), 'data/linelist2.dat')
+# TODO alter for zaratan
+line_list = os.path.join(os.getcwd(), 'merlin/linelists/linelist2.dat')
 emission_interpolator = EmissionLineInterpolator(line_list, lines)
 
 # Add flux and luminosity fields for all lines in the list

@@ -38,12 +38,13 @@ line (e.g. line 0 = HII, density normalized):
 # TODO docstrings
 
 class EmissionLineInterpolator:
-    def __init__(self, filename, lines):
+    def __init__(self, filename: str, lines):
         '''
         Initializes the interpolator with line list loaded from the given 
         filename/filepath.
         
         Parameters:
+        -----------
         filename (str): The name/path of the file to load the line emission 
         data from. This contains a text table. A commented (unread) header
         displays the lines in the table. The next line (read) gives
@@ -55,7 +56,6 @@ class EmissionLineInterpolator:
         Each row is for a specific configuration of parameters.
         The parameters iterate in a known fashion, allowing each column
         to be reconfigured into a data cube (flux at each U, N, T point).
-
         '''
 
         self.filename = filename
@@ -145,17 +145,20 @@ class EmissionLineInterpolator:
             )
 
 
-    def get_interpolator(self, lineidx, dens_normalized):
+    def get_interpolator(self, lineidx: int, dens_normalized: bool)->\
+        RegularGridInterpolator:
         '''
         Returns the interpolator for the specified line and normalization 
         option.
         
         Parameters:
+        -----------
         lineidx (int): Index of the emission line.
         dens_normalized (bool): Flag - whether to use the density squared 
         normalized interpolator.
         
         Returns:
+        --------
         RegularGridInterpolator: The corresponding interpolator object.
         '''
 
@@ -164,17 +167,19 @@ class EmissionLineInterpolator:
         return self.interpolator[lineidx]
 
 
-    def get_line_emission(self, idx, dens_normalized):
+    def get_line_emission(self, idx: int, dens_normalized: bool):
         '''
         Returns a function for line emission of index idx.
         Allows for the batch creation of flux derived fields for various lines.
         
         Parameters:
+        -----------
         idx (int): The index of the emission line.
         dens_normalized (bool): Flag - whether to use the density squared 
         normalized version.
         
         Returns:
+        --------
         function: A function that calculates the emission as a derived field.
         The data parameter represents simulation data loaded into yt.
         '''
@@ -199,14 +204,13 @@ class EmissionLineInterpolator:
             T = np.log10(T_val)
 
             # Adjust log values to within bounds supported by interpolation 
-            # #table
+            # table
             Uadj = np.where(U < self.minU, self.minU, U)
             Uadj = np.where(Uadj > self.maxU, self.maxU, Uadj)
 
             Nadj = np.where(N < self.minN, self.minN, N)
             Nadj = np.where(Nadj > self.maxN, self.maxN, Nadj)
 
-            # TODO set to 0 below
             Tadj = np.where(T < self.minT, self.minT, T)
             Tadj = np.where(Tadj > self.maxT, self.maxT, Tadj)
 

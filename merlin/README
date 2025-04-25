@@ -1,7 +1,7 @@
-# Merlin
+Merlin
 
-## Nebular Line Emission Diagnostics from Cosmological Simulations of 
-## Early Universe Galaxies.
+Nebular Line Emission Diagnostics from Cosmological Simulations of 
+Early Universe Galaxies.
 
 Author: Braden Nowicki
 Advisor: Dr. Massimo Ricotti
@@ -24,6 +24,9 @@ MERLIN
 |   |-- tools.py : Suite of functions for performing analysis on data
 |                       output from many time slices.
 |   |-- linelists/ : Cloudy grid run-generated line list data.
+|   |   |       Contains flux for each line under specific gas parameters.
+|   |   |       Note: Some parameter combinations may be nonphysical and thus
+|   |   |       unused.
 |   |   |       Parameter Space: minU, maxU, stepU, minN, maxN, stepN, minT,
 |   |   |           maxT, stepT
 |   |   |-- linelist.dat : -6.0 1.0 0.5 -1.0 6.0 0.5 3.0 6.0 0.1
@@ -31,18 +34,31 @@ MERLIN
 
 
 Dependencies:
--->
--->
--->
--->
--->
--->
--->
--->
--->
--->
--->
--->
+-------------
+--> matplotlib
+    |-- matplotlib.pyplot
+    |-- matplotlib.colors : LogNorm
+    |-- matplotlib.gridspec : GridSpec
+--> scipy
+    |-- scipy.interpolate : RegularGridInterpolator
+    |-- scipy.special : voigt_profile
+    |-- scipy.ndimage : gaussian_filter
+--> numpy
+--> astropy
+    |-- astropy.cosmology : FlatLambdaCDM
+--> yt
+    |-- yt.frontends.ramses.field_handlers : RTFieldFileHandler
+--> pandas
+
+--> os
+--> shutil
+--> sys
+--> os
+--> glob
+--> copy
+--> re
+--> ffmpeg
+
 
 The Merlin is a small species of falcon from the Northern Hemisphere.
 The naming of this package is inspired by the Merlin's exceptionally sharp

@@ -30,13 +30,13 @@ parallel="parallel -N 1 --delay .2 -j $SLURM_NTASKS --joblog parallel_joblog --r
 directory="/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial" 
 
 # Specify the files
-file_format="output_*" 
+file_format="output_*/info_0*.txt" 
 
 # Specify the Python script to run
 script="zaratan_files/galaxy_emission.py" 
 
 #file_list="$directory/output_00304 $directory/output_00305"
-dir_list=$(ls -d $directory/output_*)
+dir_list=$(ls -d $directory/output_*/info_0*.txt)
 
 # Run the tasks:
 $parallel "$srun python3 $script {}" ::: $dir_list  
