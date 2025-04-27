@@ -506,3 +506,4 @@ viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # TODO OII ratio
 # TODO lims - fix dicts
 # TODO phase plot lims, annotation, more phases
+# TODO change title and axis font sizes
