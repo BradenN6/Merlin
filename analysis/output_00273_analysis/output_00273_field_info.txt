@@ -242,4 +242,4 @@
 ('gas', 'luminosity_S2_6730.82A')_max: 7.42741509697626e+33
 ('gas', 'luminosity_S2_6730.82A')_mean: 3.0977275004450956e+30
 ('gas', 'luminosity_S2_6730.82A')_agg: 5.322444143532253e+36
-Stellar Mass: 5.1672707802692564e-11 code_mass
+Stellar Mass: 5.1672707802692564e-11

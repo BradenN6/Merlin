@@ -251,12 +251,14 @@ class VisualizationManager:
 
         plt.xlabel(f'X [{length_unit}]', fontsize=12)
         plt.ylabel(f'Y [{length_unit}]', fontsize=12)
-        plt.title(title, fontsize=14)
+        #plt.title(title, fontsize=14)
 
         plt.xlim(-lbox / 2, lbox / 2)
         plt.ylim(-lbox / 2, lbox / 2)
 
         cbar = plt.colorbar(im)
+        cbar.set_label(title, size=16)#labelpad=10, y=1.05)
+
 
         # Add redshift
         plt.text(0.05, 0.05, f'z = {redshift:.5f}', color='white', fontsize=9,
@@ -445,6 +447,8 @@ class VisualizationManager:
         Returns:
         --------
         TODO
+
+        TODO lims on profiles, z
         '''
 
 
@@ -481,7 +485,7 @@ class VisualizationManager:
 
         # Profile plot at the top (z vs x), touching top border of phase plot
         ax1 = fig.add_subplot(gs[0, 0:3])
-        avg_z_vals_x = np.mean(10 ** z_vals, axis=1)[::-1]
+        avg_z_vals_x = np.mean(10 ** z_vals, axis=0)#[::-1]
         avg_z_vals_x[avg_z_vals_x < 1e-30] = 1e-30
         if linear:
             ax1.plot(x_vals, avg_z_vals_x, color="blue")
@@ -505,7 +509,7 @@ class VisualizationManager:
 
         # Profile plot on the right (z vs y), touching right border of phase
         ax2 = fig.add_subplot(gs[1:4, 3])
-        avg_z_vals_y = np.mean(10 ** z_vals, axis=0)[::-1]
+        avg_z_vals_y = np.mean(10 ** z_vals, axis=1)#[::-1]
         avg_z_vals_y[avg_z_vals_y < 1e-30] = 1e-30
 
         if linear:
@@ -1060,10 +1064,12 @@ class VisualizationManager:
         p_img = np.array(p_frb[field[0], field[1]])
         star_bins = 2000
         star_mass = np.ones_like(center[0]) * 10
-        pop2_xyz = np.array(
-            ds.arr(np.vstack([x_pos, y_pos, z_pos]),
-                   "code_length").to("pc")).T
-        pop2_xyz = np.array(ds.arr(np.vstack([x_pos, y_pos, z_pos]), "code_length").to("pc")).T
+        #pop2_xyz = np.array(
+        #    ds.arr(np.vstack([x_pos, y_pos, z_pos]),
+        #           "code_length").to("pc")).T
+        #pop2_xyz = np.array(ds.arr(np.vstack([x_pos, y_pos, z_pos]), "code_length").to("pc")).T
+        pop2_xyz = np.vstack([x_pos, y_pos, z_pos]) * ds.length_unit.in_units("pc")
+        pop2_xyz = pop2_xyz.T
         extent_dens = [-lbox/2, lbox/2, -lbox/2, lbox/2]
         #gas_range = (20, 2e4)
         #norm1 = LogNorm(vmin=lims[0], vmax=lims[1])

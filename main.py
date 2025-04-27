@@ -119,7 +119,15 @@ def _my_H_nuclei_density(field, data):
 
 def _OII_ratio(field, data):
     # TODO lum or flux?
-    return data['gas', 'flux_O2_3728.80A']/data['gas', 'flux_O2_3726.10A']
+    #return data['gas', 'flux_O2_3728.80A']/data['gas', 'flux_O2_3726.10A']
+    flux1 = data['gas', 'flux_O2_3728.80A']
+    flux2 = data['gas', 'flux_O2_3726.10A']
+
+    flux2 = np.where(flux2 < 1e-30, 1e-30, flux2)
+
+    ratio = flux1 / flux2
+
+    return ratio
 
 
 def _pressure(field, data):
@@ -409,15 +417,16 @@ for line in lines:
     #weight_field_list.append(None)
 
 
-viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
-                     weight_field_list, title_list, proj=True, slc=False)
+#viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
+#                     weight_field_list, title_list, proj=True, slc=False)
 
 
 
 # Phase Plots
 
 extrema = {('gas', 'my_temperature'): (1e3, 1e8),
-           ('gas', 'my_H_nuclei_density'): (1e-4, 1e6)}
+           ('gas', 'my_H_nuclei_density'): (1e-4, 1e6),
+           ('gas', 'flux_H1_6562.80A'): (1e-20, 1e-14)}
 
 # ('gas', 'flux_H1_6562.80A'): {} Set z - field TODO
 
@@ -437,11 +446,11 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
                         x_label='Temperature [K]',
                         y_label=r'H Nuclei Number Density [cm$^{-3}$]',
                         z_label=line_title.replace('_', ' ') + 
-                            r' Flux [erg s$^{-1}$ cm$^{-2}$]')
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', linear=True)
 
 # Spectra Generation
 
-viz.spectra_driver(ds, 1000, 1e-25)
+#viz.spectra_driver(ds, 1000, 1e-25)
 # TODO lum_lims
 
 
@@ -455,9 +464,9 @@ viz.plot_cumulative_field(ds, sp, ('gas', 'flux_H1_6562.80A'),
                             (0,1000))
 
 # Stellar Density
-#viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
-#                    line_title.replace('_', ' ') + 
-#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=False)
+viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
+                    line_title.replace('_', ' ') + 
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=False)
 
 # TODO OII ratio
 # TODO lims
