@@ -316,6 +316,40 @@ viz.save_sim_info(ds)
 
 # Projection and Slice Plots
 
+lims_00273 = {
+    'Ionization Parameter': [10e-7, 10e-1],
+    'Number Density': [10e-2, 10e5],
+    'Mass Density': [10e-26, 10e-19],
+    'Temperature': [10e1, 10e6],
+    'Metallicity': [10e-2, 10e1],
+    "H1_6562.80A": [10e-7, 10e2],
+    "O1_1304.86A": [10e-9, 10e1],
+    "O1_6300.30A": [10e-8, 10e-3],
+    "O2_3728.80A": [10e-7, 10e-2],
+    "O2_3726.10A": [10e-7, 10e-2],
+    "O3_1660.81A": [10e-8, 10e-4],
+    "O3_1666.15A": [10e-8, 10e-3],
+    "O3_4363.21A": [10e-9, 10e-4],
+    "O3_4958.91A": [10e-8, 10e-3],
+    "O3_5006.84A": [10e-8, 10e-3], 
+    "He2_1640.41A": [10e-10, 10e-3],
+    "C2_1335.66A": [10e-8, 10e2],
+    "C3_1906.68A": [10e-7, 10e-2],
+    "C3_1908.73A": [10e-7, 10e-2],
+    "C4_1549.00A": [10e-16, 10e-9],
+    "Mg2_2795.53A": [10e-8, 10e2],
+    "Mg2_2802.71A": [10e-8, 10e2],
+    "Ne3_3868.76A": [10e-9, 10e-4],
+    "Ne3_3967.47A": [10e-9, 10e-5],
+    "N5_1238.82A": [10e-14, 10e-4],
+    "N5_1242.80A": [10e-14, 10e-4],
+    "N4_1486.50A": [10e-10, 10e-4],
+    "N3_1749.67A": [10e-8, 10e-4],
+    "S2_6716.44A": [10e-8, 10e-2],
+    "S2_6730.82A": [10e-8, 10e-3],
+    ('gas', 'flux_H1_6562.80A'): [10e-6, 10e3]
+}
+
 '''
 lims_fiducial_00319 = {
     'Ionization Parameter': [10e-7, 10e0],
@@ -466,9 +500,9 @@ viz.plot_cumulative_field(ds, sp, ('gas', 'flux_H1_6562.80A'),
 # Stellar Density
 viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
                     line_title.replace('_', ' ') + 
-                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=False)
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=True,
+                            lims_dict=lims_00273)
 
 # TODO OII ratio
-# TODO lims
-# TODO stellar density
+# TODO lims - fix dicts
 # TODO phase plot lims, annotation, more phases

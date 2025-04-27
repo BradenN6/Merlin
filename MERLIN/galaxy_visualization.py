@@ -543,7 +543,7 @@ class VisualizationManager:
 
 
         z_total = sp.quantities.total_quantity(z_field).value
-        annotation_text = f'{z_label} Total: {z_total}'
+        annotation_text = f'Total: {z_total:.4f}'
         fig.text(0.95, 0.95, annotation_text, ha='right', va='top',
                  fontsize=12, color='black')
 
@@ -688,16 +688,6 @@ class VisualizationManager:
         TODO ad
         '''
 
-        #fields = [
-        #    ('gas', 'temperature'),
-        #    ('gas', 'density'),
-            #('gas', 'number_density'),
-        #    ('gas', 'my_H_nuclei_density'),
-        #    ('gas', 'my_temperature'),
-        #    ('gas', 'ion_param'),
-        #    ('gas', 'metallicity')
-        #]
-
         fields = [
             ('gas', 'temperature'),
             ('gas', 'density'),
@@ -705,7 +695,7 @@ class VisualizationManager:
             ('gas', 'my_temperature'),
             ('gas', 'ion_param'),
             ('gas', 'metallicity'),
-        #    ('gas', 'OII_ratio'),
+            ('gas', 'OII_ratio'),
             ('ramses', 'xHI'),
             ('ramses', 'xHII'),
             ('ramses', 'xHeII'),
@@ -1063,7 +1053,7 @@ class VisualizationManager:
         p_frb = p.frb
         p_img = np.array(p_frb[field[0], field[1]])
         star_bins = 2000
-        star_mass = np.ones_like(center[0]) * 10
+        star_mass = np.ones_like(x_pos) * 10
         #pop2_xyz = np.array(
         #    ds.arr(np.vstack([x_pos, y_pos, z_pos]),
         #           "code_length").to("pc")).T
@@ -1071,8 +1061,6 @@ class VisualizationManager:
         pop2_xyz = np.vstack([x_pos, y_pos, z_pos]) * ds.length_unit.in_units("pc")
         pop2_xyz = pop2_xyz.T
         extent_dens = [-lbox/2, lbox/2, -lbox/2, lbox/2]
-        #gas_range = (20, 2e4)
-        #norm1 = LogNorm(vmin=lims[0], vmax=lims[1])
     
         stellar_mass_dens, _, _ = \
             np.histogram2d(pop2_xyz[:, 0], pop2_xyz[:, 1],
@@ -1089,20 +1077,27 @@ class VisualizationManager:
         lumcmap = "cmr.amethyst"
         plt.imshow(stellar_mass_dens, norm = norm2, extent = extent_dens,
                    origin = 'lower', aspect = 'auto', cmap = 'winter_r')
-        plt.colorbar(label = "Stellar Mass Density")
+        cbar = plt.colorbar(pad=0.04)
+        cbar.set_label('Stellar Mass Density', size=16)
         plt.xlabel("X (pc)")
         plt.ylabel("Y (pc)")
-        plt.title("Stellar Mass Density Distribution")
-        plt.text(0.05, 0.05, f'z = {redshift:.5f}', color='white', fontsize=9,
+        #plt.title("Stellar Mass Density Distribution")
+        plt.text(0.05, 0.05, f'z = {redshift:.5f}', color='black', fontsize=9,
                  ha='left', va='bottom', transform=plt.gca().transAxes)
         plt.savefig(fname=fname)
         plt.close()
     	
         if gas_flag:
-            #print(np.min(p_img), np.max(p_img))  # Check for min/max values of p_img
-            #print(np.min(stellar_mass_dens), np.max(stellar_mass_dens))  # Check for min/max values of stellar_mass_dens
+            # Check for min/max values of p_img
+            #print(np.min(p_img), np.max(p_img))
+            # Check for min/max values of stellar_mass_dens
+            #print(np.min(stellar_mass_dens), np.max(stellar_mass_dens))  
 
-            overlay_fname = fname + field[1]
+            #gas_range = (20, 2e4)
+            lims = lims_dict[field]
+            norm1 = LogNorm(vmin=lims[0], vmax=lims[1])
+
+            overlay_fname = fname + field[1] + '.png'
             fig, ax = plt.subplots(figsize = (12, 8))
             alpha_star = stellar_mass_dens
             alpha_star = np.where(stellar_mass_dens <= 1, 0.0, 1)
@@ -1115,8 +1110,8 @@ class VisualizationManager:
                              cmap = 'inferno',
                              alpha = 1, interpolation='bilinear')
             cbar1 = fig.colorbar(img1, ax = ax, orientation = 'vertical',
-                                 pad = 0.02)
-            cbar1.set_label('Projected ' + gas_title)
+                                 pad = 0.04)
+            cbar1.set_label('Projected ' + gas_title, size=16)
             img2 = ax.imshow(stellar_mass_dens, norm = norm2,
                              extent = extent_dens, origin = 'lower',
                              aspect = 'auto', cmap = 'winter_r',
@@ -1132,12 +1127,12 @@ class VisualizationManager:
             img2.set_alpha(alpha_star)
 
             cbar2 = fig.colorbar(img2, ax = ax, orientation = 'vertical',
-                                 pad = 0.02)
-            cbar2.set_label("Stellar Mass Density")
+                                 pad = 0.04)
+            cbar2.set_label("Stellar Mass Density", size=16)
             # ax.scatter(pop2_xyz[:, 0], pop2_xyz[:, 1], s=5, marker='.', color='black')
             ax.set_xlabel("X (pc)")
             ax.set_ylabel("Y (pc)")
-            ax.set_title(gas_title + ' and Stellar Mass Density Distribution')
+            #ax.set_title(gas_title + ' and Stellar Mass Density Distribution')
             ax.set_xlim(-lbox / 2, lbox / 2)
             ax.set_ylim(-lbox / 2, lbox / 2)
 
