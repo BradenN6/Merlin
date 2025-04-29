@@ -30,6 +30,8 @@ given a filepath for a Cloudy-generated line flux list/data table.
 # TODO docstrings
 # TODO change to use mytemperature
 # TODO new hydrofile versions
+# TODO change lims dict to field format
+# TODO alternative shell script
 
 
 #filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
@@ -311,8 +313,8 @@ width = (1500, 'pc')
 
 # Save Simulation Information
 viz.save_sim_info(ds)
-#viz.save_sim_field_info(ds, ad, sp)
-#viz.calc_luminosities(sp)
+viz.save_sim_field_info(ds, ad, sp)
+viz.calc_luminosities(sp)
 
 # Projection and Slice Plots
 
@@ -422,10 +424,10 @@ title_list = [
     'Ionization Parameter',
     'Metallicity',
     #r'OII Ratio 3728.80$\AA$/3726.10$\AA$',
-    r'X_{HI}',
-    r'X_{HII}',
-    r'X_{HeII}',
-    r'X_{HeIII}',
+    r'X$_{HI}$',
+    r'X$_{HII}$',
+    r'X$_{HeII}$',
+    r'X$_{HeIII}$',
 ]
 
 field_list.append(('gas', 'flux_'  + 'H1_6562.80A'))
@@ -451,8 +453,8 @@ for line in lines:
     #weight_field_list.append(None)
 
 
-#viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
-#                     weight_field_list, title_list, proj=True, slc=False)
+viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
+                     weight_field_list, title_list, proj=True, slc=False)
 
 
 
@@ -484,7 +486,7 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
 
 # Spectra Generation
 
-#viz.spectra_driver(ds, 1000, 1e-25)
+viz.spectra_driver(ds, 1000, 1e-25)
 # TODO lum_lims
 
 
@@ -507,3 +509,4 @@ viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # TODO lims - fix dicts
 # TODO phase plot lims, annotation, more phases
 # TODO change title and axis font sizes
+#TODO total on phase profile

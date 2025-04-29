@@ -539,13 +539,14 @@ class VisualizationManager:
 
         # Add colorbar on the right side of the profile plot
         cbar_ax = fig.add_axes([0.87, 0.15, 0.03, 0.7])
-        fig.colorbar(cax, cax=cbar_ax, orientation='vertical', label=z_label)
+        fig.colorbar(cax, cax=cbar_ax, orientation='vertical', label=z_label,
+                     size=15)
 
 
-        z_total = sp.quantities.total_quantity(z_field).value
-        annotation_text = f'Total: {z_total:.4f}'
-        fig.text(0.95, 0.95, annotation_text, ha='right', va='top',
-                 fontsize=12, color='black')
+        #z_total = sp.quantities.total_quantity(z_field).value
+        #annotation_text = f'Total: {z_total:.4f}'
+        #fig.text(0.95, 0.95, annotation_text, ha='right', va='top',
+        #         fontsize=12, color='black')
 
         # Save the figure
         plt.savefig(fname, dpi=300)

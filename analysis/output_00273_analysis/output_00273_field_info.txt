@@ -22,6 +22,10 @@
 ('gas', 'metallicity')_max: 0.016873830496898556
 ('gas', 'metallicity')_mean: 3.213934215755255e-05
 ('gas', 'metallicity')_agg: 55.22107849023716
+('gas', 'OII_ratio')_min: 0.0
+('gas', 'OII_ratio')_max: 1.5083275632690225
+('gas', 'OII_ratio')_mean: 0.40868950586258124
+('gas', 'OII_ratio')_agg: 702200.9091144522
 ('ramses', 'xHI')_min: 1.6777110764819864e-08
 ('ramses', 'xHI')_max: 0.9999765731567463
 ('ramses', 'xHI')_mean: 0.66718080182988
