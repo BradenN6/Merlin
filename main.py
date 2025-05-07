@@ -313,7 +313,7 @@ width = (1500, 'pc')
 
 # Save Simulation Information
 viz.save_sim_info(ds)
-viz.save_sim_field_info(ds, ad, sp)
+#viz.save_sim_field_info(ds, ad, sp)
 viz.calc_luminosities(sp)
 
 # Projection and Slice Plots
@@ -424,10 +424,10 @@ title_list = [
     'Ionization Parameter',
     'Metallicity',
     #r'OII Ratio 3728.80$\AA$/3726.10$\AA$',
-    r'X$_{HI}$',
-    r'X$_{HII}$',
-    r'X$_{HeII}$',
-    r'X$_{HeIII}$',
+    r'X$_{\text{HI}}$',
+    r'X$_{\text{HII}}$',
+    r'X$_{\text{HeII}}$',
+    r'X$_{\text{HeIII}}$',
 ]
 
 field_list.append(('gas', 'flux_'  + 'H1_6562.80A'))
@@ -509,4 +509,4 @@ viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # TODO lims - fix dicts
 # TODO phase plot lims, annotation, more phases
 # TODO change title and axis font sizes
-#TODO total on phase profile
+# TODO total on phase profile

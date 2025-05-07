@@ -115,10 +115,12 @@ class Simulation_Post_Analysis:
 
         float_pattern = r'[-+]?\d*\.\d+([eE][-+]?\d+)?'
 
-        info_file_pattern = self.data_path + 'output_*_sin_info.txt'
+        info_file_pattern = self.data_path + 'output_*_sim_info.txt'
         field_info_pattern = self.data_path + 'output_*_field_info.txt'
         lum_pattern = self.data_path + 'output_*_line_luminosity.txt'
         header_pattern = self.data_path + 'header_*.txt'
+
+        print(info_file_pattern)
 
         sim_info_files = self.get_files(info_file_pattern)
         #field_info_files = self.get_files(info_file_pattern)
@@ -138,12 +140,16 @@ class Simulation_Post_Analysis:
             if not match:
                 continue
             output_id = match.group(1)
+            print(output_id)
 
             row_data = {"output_id": int(output_id)}
             row_data.update(self.parse_file_to_dict(sim_file))
 
-            lum_file = f"output_{output_id}_line_luminosity.txt"
-            field_info_file = f"output_{output_id}_field_info.txt"
+            lum_file = self.data_path + f"output_{output_id}_line_luminosity.txt"
+            field_info_file = self.data_path + f"output_{output_id}_field_info.txt"
+
+            print(lum_file)
+            print(field_info_file)
 
             if os.path.exists(lum_file):
                 row_data.update(self.parse_file_to_dict(lum_file))
@@ -183,7 +189,7 @@ class Simulation_Post_Analysis:
     #    '''
 
 
-
+'''
 post = Simulation_Post_Analysis('CC_Fiducial',
                                 '/Users/bnowicki/Documents/Research/Ricotti/CC_Fiducial_analysis/movie_dir/')
 
@@ -216,7 +222,7 @@ plt.tight_layout()
 plt.savefig("plot.png")
 plt.show()
 
-
+'''
 
     
 
