@@ -276,7 +276,7 @@ class VisualizationManager:
 
     def plot_wrapper(self, ds, sp, width, center, field_list,
                      weight_field_list, title_list, proj=True, slc=True,
-                     lims_dict=None, lims_titles=None):
+                     lims_dict=None):
         '''
         Wrapper for plotting a variety of fields simultaneously.
 
@@ -294,8 +294,6 @@ class VisualizationManager:
         title_list (List of str): list of titles associated with plots
         lims_dict (None or Dict): dictionary of [vmin, vmax] fixed limits on
             colorbar values for image if desired; otherwise None
-        lims_titles (List, str): titles associated with lims_dict for
-            corresponding fields
 
         Returns:
         --------
@@ -319,7 +317,7 @@ class VisualizationManager:
                     p_img = self.convert_to_plt(p, 'proj', field, width,
                                                 redshift,
                                                 'Projected ' + title_list[i],
-                                                lims_dict[lims_titles[i]])
+                                                lims_dict[field])
 
             if slc:
                 p = self.slc_plot(ds, width, center, field)
@@ -331,7 +329,7 @@ class VisualizationManager:
                 else:
                     p_img = self.convert_to_plt(p, 'slc', field, width,
                                                 redshift, title_list[i],
-                                                lims_dict[lims_titles[i]])
+                                                lims_dict[field])
                     
             p_img_arr.append(p_img)
         

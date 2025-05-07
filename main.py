@@ -318,74 +318,81 @@ viz.calc_luminosities(sp)
 
 # Projection and Slice Plots
 
+'''
 lims_00273 = {
     'Ionization Parameter': [10e-7, 10e-1],
     'Number Density': [10e-2, 10e5],
     'Mass Density': [10e-26, 10e-19],
     'Temperature': [10e1, 10e6],
     'Metallicity': [10e-2, 10e1],
-    "H1_6562.80A": [10e-7, 10e2],
+    ('gas', "H1_6562.80A"): [10e-7, 10e2],
     "O1_1304.86A": [10e-9, 10e1],
     "O1_6300.30A": [10e-8, 10e-3],
     "O2_3728.80A": [10e-7, 10e-2],
     "O2_3726.10A": [10e-7, 10e-2],
     "O3_1660.81A": [10e-8, 10e-4],
-    "O3_1666.15A": [10e-8, 10e-3],
-    "O3_4363.21A": [10e-9, 10e-4],
-    "O3_4958.91A": [10e-8, 10e-3],
-    "O3_5006.84A": [10e-8, 10e-3], 
-    "He2_1640.41A": [10e-10, 10e-3],
-    "C2_1335.66A": [10e-8, 10e2],
-    "C3_1906.68A": [10e-7, 10e-2],
-    "C3_1908.73A": [10e-7, 10e-2],
-    "C4_1549.00A": [10e-16, 10e-9],
-    "Mg2_2795.53A": [10e-8, 10e2],
-    "Mg2_2802.71A": [10e-8, 10e2],
-    "Ne3_3868.76A": [10e-9, 10e-4],
-    "Ne3_3967.47A": [10e-9, 10e-5],
-    "N5_1238.82A": [10e-14, 10e-4],
-    "N5_1242.80A": [10e-14, 10e-4],
-    "N4_1486.50A": [10e-10, 10e-4],
-    "N3_1749.67A": [10e-8, 10e-4],
-    "S2_6716.44A": [10e-8, 10e-2],
-    "S2_6730.82A": [10e-8, 10e-3],
+    'O3_1666.15A': [10e-8, 10e-3],
+    'O3_4363.21A': [10e-9, 10e-4],
+    'O3_4958.91A': [10e-8, 10e-3],
+    'O3_5006.84A': [10e-8, 10e-3], 
+    'He2_1640.41A': [10e-10, 10e-3],
+    'C2_1335.66A': [10e-8, 10e2],
+    'C3_1906.68A': [10e-7, 10e-2],
+    'C3_1908.73A': [10e-7, 10e-2],
+    'C4_1549.00A': [10e-16, 10e-9],
+    'Mg2_2795.53A': [10e-8, 10e2],
+    'Mg2_2802.71A': [10e-8, 10e2],
+    'Ne3_3868.76A': [10e-9, 10e-4],
+    'Ne3_3967.47A': [10e-9, 10e-5],
+    'N5_1238.82A': [10e-14, 10e-4],
+    'N5_1242.80A': [10e-14, 10e-4],
+    'N4_1486.50A': [10e-10, 10e-4],
+    'N3_1749.67A': [10e-8, 10e-4],
+    'S2_6716.44A': [10e-8, 10e-2],
+    'S2_6730.82A': [10e-8, 10e-3],
     ('gas', 'flux_H1_6562.80A'): [10e-6, 10e3]
 }
+'''
 
-'''
 lims_fiducial_00319 = {
-    'Ionization Parameter': [10e-7, 10e0],
-    'Number Density': [10e-3, 10e2],
-    'Mass Density': [10e-27, 10e-20],
-    'Temperature': [10e2, 10e10],
-    'Metallicity': [10e-3, 10e0],
-    "H1_6562.80A": [10e-9, 10e2],
-    "O1_1304.86A": [10e-13, 10e-4],
-    "O1_6300.30A": [10e-12, 10e-3],
-    "O2_3728.80A": [10e-11, 10e-2],
-    "O2_3726.10A": [10e-11, 10e-2],
-    "O3_1660.81A": [10e-12, 10e-3],
-    "O3_1666.15A": [10e-11, 10e-3],
-    "O3_4363.21A": [10e-12, 10e-4],
-    "O3_4958.91A": [10e-11, 10e-3],
-    "O3_5006.84A": [10e-11, 10e-3], 
-    "He2_1640.41A": [10e-9, 10e-4],
-    "C2_1335.66A": [10e-12, 10e-3],
-    "C3_1906.68A": [10e-11, 10e-2],
-    "C3_1908.73A": [10e-10, 10e-3],
-    "C4_1549.00A": [10e-13, 10e-7],
-    "Mg2_2795.53A": [10e-11, 10e-2],
-    "Mg2_2802.71A": [10e-11, 10e-2],
-    "Ne3_3868.76A": [10e-12, 10e-4],
-    "Ne3_3967.47A": [10e-12, 10e-4],
-    "N5_1238.82A": [10e-8, 10e-3],
-    "N5_1242.80A": [10e-9, 10e-4],
-    "N4_1486.50A": [10e-12, 10e-3],
-    "N3_1749.67A": [10e-11, 10e-4],
-    "S2_6716.44A": [10e-11, 10e-3],
-    "S2_6730.82A": [10e-11, 10e-3]
+    ('gas', 'temperature'): [10e2, 10e10],
+    ('gas', 'density'): [10e-3, 10e2],
+    ('gas', 'my_H_nuclei_density'): [10e-3, 10e2],
+    ('gas', 'my_temperature'): [10e2, 10e10],
+    ('gas', 'ion_param'): [10e-7, 10e0],
+    ('gas', 'metallicity'): [10e-3, 10e0],
+    ('gas', 'OII_ratio'): [1e-5, 1.5],
+    ('ramses', 'xHI'): [1e-1, 1e0],
+    ('ramses', 'xHII'): [1e-1, 1e0],
+    ('ramses', 'xHeII'): [1e-1, 1e0],
+    ('ramses', 'xHeIII'): [1e-1, 1e0],
+    ('gas', 'flux_H1_6562.80A'): [10e-9, 10e2],
+    ('gas', 'flux_O1_1304.86A'): [10e-13, 10e-4],
+    ('gas', 'flux_O1_6300.30A'): [10e-12, 10e-3],
+    ('gas', 'flux_O2_3728.80A'): [10e-11, 10e-2],
+    ('gas', 'flux_O2_3726.10A'): [10e-11, 10e-2],
+    ('gas', 'flux_O3_1660.81A'): [10e-12, 10e-3],
+    ('gas', 'flux_O3_1666.15A'): [10e-11, 10e-3],
+    ('gas', 'flux_O3_4363.21A'): [10e-12, 10e-4],
+    ('gas', 'flux_O3_4958.91A'): [10e-11, 10e-3],
+    ('gas', 'flux_O3_5006.84A'): [10e-11, 10e-3], 
+    ('gas', 'flux_He2_1640.41A'): [10e-9, 10e-4],
+    ('gas', 'flux_C2_1335.66A'): [10e-12, 10e-3],
+    ('gas', 'flux_C3_1906.68A'): [10e-11, 10e-2],
+    ('gas', 'flux_C3_1908.73A'): [10e-10, 10e-3],
+    ('gas', 'flux_C4_1549.00A'): [10e-13, 10e-7],
+    ('gas', 'flux_Mg2_2795.53A'): [10e-11, 10e-2],
+    ('gas', 'flux_Mg2_2802.71A'): [10e-11, 10e-2],
+    ('gas', 'flux_Ne3_3868.76A'): [10e-12, 10e-4],
+    ('gas', 'flux_Ne3_3967.47A'): [10e-12, 10e-4],
+    ('gas', 'flux_N5_1238.82A'): [10e-8, 10e-3],
+    ('gas', 'flux_N5_1242.80A'): [10e-9, 10e-4],
+    ('gas', 'flux_N4_1486.50A'): [10e-12, 10e-3],
+    ('gas', 'flux_N3_1749.67A'): [10e-11, 10e-4],
+    ('gas', 'flux_S2_6716.44A'): [10e-11, 10e-3],
+    ('gas', 'flux_S2_6730.82A'): [10e-11, 10e-3]
 }
-'''
+
 # TODO lims
 
 field_list = [
@@ -395,7 +402,7 @@ field_list = [
     ('gas', 'my_temperature'),
     ('gas', 'ion_param'),
     ('gas', 'metallicity'),
-    #('gas', 'OII_ratio'),
+    ('gas', 'OII_ratio'),
     ('ramses', 'xHI'),
     ('ramses', 'xHII'),
     ('ramses', 'xHeII'),
@@ -409,7 +416,7 @@ weight_field_list = [
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
-    #('gas', 'my_H_nuclei_density'),
+    ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
@@ -423,7 +430,7 @@ title_list = [
     'Temperature [K]',
     'Ionization Parameter',
     'Metallicity',
-    #r'OII Ratio 3728.80$\AA$/3726.10$\AA$',
+    r'OII Ratio 3728.80$\AA$/3726.10$\AA$',
     r'X$_{\text{HI}}$',
     r'X$_{\text{HII}}$',
     r'X$_{\text{HeII}}$',
@@ -454,8 +461,8 @@ for line in lines:
 
 
 viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
-                     weight_field_list, title_list, proj=True, slc=False)
-
+                     weight_field_list, title_list, proj=True, slc=False,
+                     lims_dict=lims_fiducial_00319)
 
 
 # Phase Plots
@@ -503,7 +510,7 @@ viz.plot_cumulative_field(ds, sp, ('gas', 'flux_H1_6562.80A'),
 viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
                     line_title.replace('_', ' ') + 
                             r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=True,
-                            lims_dict=lims_00273)
+                            lims_dict=lims_fiducial_00319)
 
 # TODO OII ratio
 # TODO lims - fix dicts
