@@ -1072,7 +1072,7 @@ class VisualizationManager:
                                      stellar_mass_dens)
         stellar_range = [1, 1200]
         norm2 = LogNorm(vmin = stellar_range[0], vmax = stellar_range[1])
-        plt.figure(figsize = (12, 8))
+        plt.figure(figsize = (8, 6))
         lumcmap = "cmr.amethyst"
         plt.imshow(stellar_mass_dens, norm = norm2, extent = extent_dens,
                    origin = 'lower', aspect = 'auto', cmap = 'winter_r')
