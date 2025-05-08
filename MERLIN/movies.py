@@ -29,7 +29,7 @@ lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3
        "Ne3_3967.47A","N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
 #image_dir = '/Users/bnowicki/Documents/Scratch/movie_dir_stellar_dist_2/'
-image_dir = '/Users/bnowicki/Documents/Research/Ricotti/new_analysis/movie_dir/'
+image_dir = '/Users/bnowicki/Documents/Scratch/analysis_fid/maindir/'
 image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_lims',
                   'output_*_1500pc_ion-param_proj', 'output_*_1500pc_ion-param_proj_lims',
                   'output_*_1500pc_luminosity_H1_6562,80A_proj', 'output_*_1500pc_flux_H1_6562,80A_slc',
@@ -41,8 +41,19 @@ image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_
                   'output_*_sim_spectra_redshifted', 'output_*_sim_spectra_redshifted_lum',
                   'output_*_sim_spectra_lims_lum', 'output_*_sim_spectra_lims',
                   'output_*_sim_spectra_redshifted_lims', 'output_*_sim_spectra_redshifted_lims_lum',
-                  'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase_profile']
-                  #'output_*_1500pc_stellar_dist', 'output_*_1500pc_stellar_dist_H1']
+                  'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase_profile',
+                  'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase',
+                  'output_*_1500pc_stellar_dist', #'output_*_1500pc_stellar_dist_H1']
+                  'output_*_my_H_nuclei_density_proj', 'output_*_my_H_nuclei_density_proj_lims',
+                  'output_*_my_temperature_proj', 'output_*_my_temperature_proj_lims',
+                  'output_*_OII_ratio_proj', 'output_*_OII_ratio_proj_lims',
+                  'output_*_xHI_proj', 'output_*_xHI_proj_lims',
+                  'output_*_xHII_proj', 'output_*_xHII_proj_lims',
+                  'output_*_xHeII_proj', 'output_*_xHeII_proj_lims',
+                  'output_*_xHeIII_proj', 'output_*_xHeIII_proj_lims',
+                  'output_*_flux_H1_6562.80A_cumulative']
+
+
 
 for line in lines:
     line_pattern = line.replace('.', ',')
