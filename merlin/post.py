@@ -134,6 +134,8 @@ class Simulation_Post_Analysis:
         #        with open(file, 'r') as file:
         #            file_content = file.read()
 
+        print(len(sim_info_files))
+
         for sim_file in sim_info_files:
             match = re.match(r"output_(\d+)_sim_info\.txt",
                              os.path.basename(sim_file))
