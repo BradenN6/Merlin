@@ -9,6 +9,9 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import os
 import re
+import itertools
+from collections import defaultdict
+
 
 # TODO read in lines avail
 lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3_1660.81A",
@@ -43,10 +46,10 @@ class Simulation_Post_Analysis:
 
 
     def make_dir(self):
-        directory = f'{self.sim_titl}_post_analysis'
+        self.directory = f'{self.sim_titl}_post_analysis'
 
-        if not os.path.exists(directory):
-            os.makedirs(directory)
+        if not os.path.exists(self.directory):
+            os.makedirs(self.directory)
 
 
     def get_files(self, pattern: str):
@@ -173,13 +176,81 @@ class Simulation_Post_Analysis:
 
         self.df = df
 
+        df.to_csv(os.path.join(self.directory, 'analysis_data.csv'),
+                  index=True)
+
         return df
 
 
 
         temp_min_pattern = fr'{field}_min: [-+]?\d*\.\d+([eE][-+]?\d+)?'
-
         temp_min = float(re.search(temp_min_pattern, file_content).group(1))
+
+
+    def lvz(self, df, lines, group_species=True):
+        '''
+        TODO
+        '''
+
+        column_list = []
+
+        for line in lines:
+            field = ('gas', f'luminosity_{line}')
+            column = str(field) + '_agg'
+            column_list.append(column)
+
+        # Group lines by element (e.g., 'O3', 'H1', etc.)
+        groups = defaultdict(list)
+        for line in lines:
+            prefix = line.split('_')[0]
+            groups[prefix].append(line)
+            print(groups)
+
+        # Set up color and linestyle cycler
+        colors = plt.rcParams['axes.prop_cycle'].by_key()['color']
+        linestyles = ['-', '--', '-.', ':']
+        style_cycler = itertools.cycle(itertools.product(colors, linestyles))
+
+        plt.figure(figsize=(10, 6))
+
+        if group_species:
+            for group, group_lines in groups.items():
+                color, linestyle = next(style_cycler)
+                for i, line in enumerate(group_lines):
+                    column = f"('gas', 'luminosity_{line}')_agg"
+                    if column in df.columns:
+                        y_vals = df[column].replace(0, np.nan)
+                        # Only label the first line of the group
+                        label = group if i == 0 else None
+                        plt.plot(df['current_redshift'], np.log10(y_vals),
+                                 color=color, linestyle=linestyle,
+                                 label=label)
+            # Show unique element legend to the right
+            plt.legend(title='Element', bbox_to_anchor=(1.05, 1),
+                       loc='upper left', borderaxespad=0.)
+        else:
+            for i, column in enumerate(column_list):
+                if column in df.columns:
+                    y_vals = df[column].replace(0, np.nan)
+                    color, linestyle = next(style_cycler)
+                    plt.plot(df['current_redshift'], np.log10(y_vals),
+                             linestyle=linestyle,
+                             color=color, label=lines[i])
+            plt.legend(bbox_to_anchor=(1.05, 1), loc='upper left', 
+                       borderaxespad=0.)
+
+        plt.xlabel('Redshift')
+        plt.ylabel(r'Luminosity [erg s$^{-1}$]')
+        plt.grid(True)
+        ax = plt.gca()
+        ax.invert_xaxis()
+        plt.tight_layout()
+
+        #plt.show()
+        if group_species:
+            plt.savefig(os.path.join(self.directory, 'lvz_group_species.png'))
+        else:
+            plt.savefig(os.path.join(self.directory, 'lvz.png'))
 
 
 
