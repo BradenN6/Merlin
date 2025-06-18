@@ -9,13 +9,6 @@ Advisor: Dr. Massimo Ricotti
 Interface with Cloudy Photoionization Software data and RAMSES-RT Simulation
 data to create galaxy images and spectra in nebular emission lines.
 
-The Merlin is a small species of falcon from the Northern Hemisphere.
-The naming of this package is inspired by the Merlin's exceptionally sharp
-eyesight; we generate observational diagnostics from simulated distant,
-high-redshift galaxies. Birds are a bellwether of environmental decline;
-populations are down nearly 3 billion birds since 1970. Please consider
-supporting local efforts to safeguard birds, their migration, and their
-habitats.
 
 ### File Structure:
 
