@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "merlin-spectra"
-version = "0.0.1"
+version = "0.0.5"
 authors = [
   { name="Braden Nowicki", email="bnowicki@terpmail.umd.edu" },
 ]
@@ -17,8 +17,6 @@ classifiers = [
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
 ]
-license = "MIT"
-license-files = ["LICEN[CS]E*"]
 dependencies = [
   "numpy>1.26",
   "scipy>1.15",
@@ -31,3 +29,12 @@ keywords = ["spectra", "astrophysics", "JWST"]
 
 [project.urls]
 Homepage = "https://github.com/BradenN6/Merlin"
+
+[tool.hatch.build]
+include = ["README.md"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/merlin_spectra"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/merlin_spectra"]
