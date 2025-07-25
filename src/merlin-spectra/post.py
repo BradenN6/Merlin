@@ -252,6 +252,9 @@ class Simulation_Post_Analysis:
         else:
             plt.savefig(os.path.join(self.directory, 'lvz.png'))
 
+    
+    
+
 
 
 

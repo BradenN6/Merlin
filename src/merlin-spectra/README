@@ -21,7 +21,7 @@ MERLIN
 |   |-- galaxy_visualization.py : Visualization and analysis routines for
 |                       RAMSES-RT Simulations.
 |   |-- movies.py : generate movies from sequences of images.
-|   |-- tools.py : Suite of functions for performing analysis on data
+|   |-- post.py : Suite of functions for performing analysis on data
 |                       output from many time slices.
 |   |-- linelists/ : Cloudy grid run-generated line list data.
 |   |   |       Contains flux for each line under specific gas parameters.

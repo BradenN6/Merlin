@@ -42,3 +42,5 @@ dir_list=$(ls -d $directory/output_*/info_0*.txt)
 $parallel "$srun python3 $script {}" ::: $dir_list  
 # in this case, we are running a script and passing it a single argument
 # parallel uses ::: to separate options.
+
+# TODO specify location of python exec
