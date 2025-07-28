@@ -3,7 +3,7 @@ import numpy as np
 import shutil
 import os
 import matplotlib.pyplot as plt
-import merlin.emission
+import merlin_spectra.emission
 import astropy
 import yt
 from yt.units import dimensions

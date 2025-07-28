@@ -12,6 +12,7 @@ import re
 import itertools
 from collections import defaultdict
 
+# TODO init to make object from csv
 
 # TODO read in lines avail
 lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3_1660.81A",
@@ -24,7 +25,7 @@ def check_file_pattern(folder_path, pattern):
     files = glob.glob(f"{folder_path}/{pattern}")
     return len(files) > 0
 
-class Simulation_Post_Analysis:
+class SimulationPostAnalysis:
     '''
     Class containing post-processing functions for a simulation - multiple
     time slices.
