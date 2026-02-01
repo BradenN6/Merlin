@@ -1,30 +1,13 @@
-#!/bin/bash --login
-#SBATCH -n 40                     #Number of processors
-#SBATCH -t 2:00:00               #Max wall time for entire job
-
-module purge
-module load parallel
-module load python
-python -m pip install --upgrade pip
-python -m pip install --user yt
-python -m pip install --user "yt[ramses]"
-pip install numpy
-pip install matplotlib
-pip install astropy
-pip install scipy
-
-# Define srun arguments:
-srun="srun -n1 -N1 --exclusive"
-# --exclusive     ensures srun uses distinct CPUs for each job step
-# -N1 -n1         allocates a single core to each task
-
-# Define parallel arguments:
-parallel="parallel -N 1 --delay .2 -j $SLURM_NTASKS --joblog parallel_joblog --resume"
-# -N 1              is number of arguments to pass to each job
-# --delay .2        prevents overloading the controlling node on short jobs
-# -j $SLURM_NTASKS  is the number of concurrent tasks parallel runs, so number of CPUs allocated
-# --joblog name     parallel's log file of tasks it has run
-# --resume          parallel can use a joblog and this to continue an interrupted run (job resubmitted)
+#!/bin/bash --login                                                                                                                                                                                  
+#SBATCH --job-name=nebular-lines                                                                                                                                                             
+#SBATCH --output=logs/job_%A_%a.out                                                                                                                                                              
+#SBATCH --error=logs/job_%A_%a.err                                                                                                                                                               
+#SBATCH --array=0-160                                                                                                                                                                                                                                                                                                                                                               
+#SBATCH --ntasks=1                                                                                                                                                                              
+#SBATCH --cpus-per-task=1
+#SBATCH --mem-per-cpu=3G                                                                                                                                                                                                                                                                                                                                            
+#SBATCH --time=00-02:00:00                                                                                                                                                                       
+#SBATCH --partition=blackhole  
 
 # Specify the directory containing the files
 directory="/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial" 
@@ -33,14 +16,31 @@ directory="/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial"
 file_format="output_*/info_0*.txt" 
 
 # Specify the Python script to run
-script="zaratan_files/galaxy_emission.py" 
+script="main.py" 
 
-#file_list="$directory/output_00304 $directory/output_00305"
-dir_list=$(ls -d $directory/output_*/info_0*.txt)
+# List of files to run as a job array
+input_files=$(ls -d $directory/output_*/info_0*.txt)
 
-# Run the tasks:
-$parallel "$srun python3 $script {}" ::: $dir_list  
-# in this case, we are running a script and passing it a single argument
-# parallel uses ::: to separate options.
+# Specify path to python install
+# include yt, numpy, matplotlib, astropy, scipy
+python_path=""
 
-# TODO specify location of python exec
+input_file=${input_files[$SLURM_ARRAY_TASK_ID]}
+
+# Echo for diagnostics
+slice_num=$(echo "$input_file" | grep -oP 'info_\K[0-9]+')
+padded_slice_num=$(printf "%05d" "$slice_num")
+output_file="stdout-$padded_scan_num.txt"
+err_file="stderr-$padded_scan_num.txt"
+
+echo "SLURM Job ID: $SLURM_ARRAY_JOB_ID"
+echo "SLURM Task ID: $SLURM_ARRAY_TASK_ID"
+echo "Using input file: $input_file"
+
+echo "which python: $(which python)"
+echo "Python Path: $python_path"
+echo "Using input file: $input_file"
+echo "Scan: $padded_scan_num"
+
+# Run the script                                                                                                                                                                        
+$python_path $script $input_file
