@@ -9,7 +9,7 @@ import os
 """
 Post-Analysis of the Fiducial Simulation
 
-Authors: Braden Nowicki, Massimo Ricotti
+Authors: Braden Marazzo-Nowicki, Massimo Ricotti
 2025-07-28
 """
 

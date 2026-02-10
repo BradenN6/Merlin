@@ -13,9 +13,9 @@ from merlin import galaxy_visualization
 '''
 main.py
 
-Author: Braden Nowicki
+Author: Braden Marazzo-Nowicki
 
-Braden Nowicki with Dr. Massimo Ricotti
+Braden Marazzo-Nowicki with Dr. Massimo Ricotti
 University of Maryland, College Park Astronomy Department
 
 Script to visualize RAMSES-RT Simulations of high-redshift galaxies in a 
@@ -34,21 +34,20 @@ given a filepath for a Cloudy-generated line flux list/data table.
 # TODO alternative shell script
 
 
-#filename = "/Users/bnowicki/Documents/Research/Ricotti/output_00273/info_00273.txt"
-filename = sys.argv[1]
+filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
+#filename = sys.argv[1]
 #print(f'Line List Filepath = {filename}')
 
-lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A",
-       "O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A","O3_5006.84A", 
-       "He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A","C4_1549.00A",
-       "Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
-       "N5_1238.82A",
-       "N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
+lines=["H1_6562.80A","H1 4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+       "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
+       "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
+       "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
+       "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
-wavelengths=[6562.80, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81, 1666.15,
-             4363.21, 4958.91, 5006.84, 1640.41, 1335.66,
-             1906.68, 1908.73, 1549.00, 2795.53, 2802.71, 3868.76,
-             3967.47, 1238.82, 1242.80, 1486.50, 1749.67, 6716.44, 6730.82]
+wavelengths=[6562.80, 4861.35, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81, 
+             1666.15, 4363.21, 4958.91, 5006.84, 1640.41, 1335.66, 1906.68, 
+             1908.73, 1549.00, 2795.53, 2802.71, 3868.76, 3967.47, 1238.82, 
+             1242.80, 1486.50, 1749.67, 6716.44, 6730.82]
 
 cell_fields = [
     "Density",
@@ -259,8 +258,8 @@ else:
 
 # Instance of EmissionLineInterpolator for line list at filename
 #line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
-# TODO alter for zaratan
-line_list = os.path.join(os.getcwd(), 'merlin/linelists/linelist2.dat')
+# TODO alter path for zaratan
+line_list = os.path.join(os.getcwd(), 'merlin_spectra/linelists/linelist-all.dat')
 emission_interpolator = EmissionLineInterpolator(line_list, lines)
 
 # Add flux and luminosity fields for all lines in the list

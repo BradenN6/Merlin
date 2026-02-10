@@ -24,15 +24,15 @@ The Cloudy Photoionization Code is used to generate line emission (flux)
 throughout the desired parameter space. We consider gas parameters
 Ionization Parameter, Hydrogen Number Density, and Temperature.
 A simple grid run is performed, simulating emission for lines present in
-CloudyFiles/gridrun/LineList_NebularO.dat and
-CloudyFiles/gridrun/LineList_NebularCN.dat (can be adjusted)
+CloudyFiles/gridrun-09-02-2026/LineList_NebularO.dat and
+CloudyFiles/gridrun-09-02-2026/LineList_NebularCN.dat (can be adjusted)
 from a 1 cm thick gas cell. The exact conditions can be adjusted (the star
 SED, for instance) for a given run; a simulation for every combination of the
 varying parameters is performed. Line list data is output in
 'LineList_NebularCN.dat' and 'LineList_NebularO.dat', then combined into a
 single 'linelist.dat' file via 'combine_tables.py'.
 
-See CloudyFiles/gridrun. interp6.in is the input file. The run file (with
+See CloudyFiles/gridrun-09-02-2026. interp6.in is the input file. The run file (with
 executable privilege) can be used in your installation of Cloudy.
 For instance, in the terminal, './run interp6' would run the desired
 simulations (note that grid runs require the use of the -r option, present
@@ -60,13 +60,17 @@ With the desired routines and field setup chosen in a driver script
 like 'main.py', analysis can be performed on multiple time slices in parallel.
 For RAMSES-RT output data stored in a cluster, use scp to copy merlin,
 a driver script like 'main.py', and a shell script like 'analysis.sh'
-to the cluster scratch space. Test that it works in the scratch space by
-running 'main.py' on one time slice. You must first perform the module loads
+to the cluster scratch space. One may test that it works in the scratch space
+by running 'main.py' on one time slice. You must first perform the module loads
 and pip installs at the beginning of 'main.py' for the dependencies.
-The shell script 'analysis.sh' shows one way to run the script on
-multiple time slices in parallel (in one job).
+The shell script 'analysis-1.sh' shows one way to run the script on
+multiple time slices in parallel (in one job). Preferably, the jobs are
+submitted in a job array to run when resources are available, since the tasks
+are completely independent (as in 'analysis.sh'). A python install path
+can be specified to avoid using the version zaratan jobs default to.
 
 #### Bulk Analysis of Multiple Time Slices
+
 
 
 #### A Note on the Naming of this Code

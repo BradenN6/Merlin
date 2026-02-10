@@ -5,7 +5,7 @@ from scipy.interpolate import RegularGridInterpolator
 '''
 emission.py
 
-Author: Braden Nowicki
+Author: Braden Marazzo-Nowicki
 
 Generate line emission fields from a Cloudy-generated linelist table.
 
