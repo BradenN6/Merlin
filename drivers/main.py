@@ -7,8 +7,9 @@ import yt
 from yt.frontends.ramses.field_handlers import RTFieldFileHandler
 import matplotlib.pyplot as plt
 
-from merlin.emission import EmissionLineInterpolator
-from merlin import galaxy_visualization
+import merlin_spectra as merlin
+#from merlin.emission import EmissionLineInterpolator
+#from merlin import galaxy_visualization
 
 '''
 main.py
@@ -38,7 +39,7 @@ filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
 #filename = sys.argv[1]
 #print(f'Line List Filepath = {filename}')
 
-lines=["H1_6562.80A","H1 4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
        "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
        "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
        "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
@@ -259,8 +260,8 @@ else:
 # Instance of EmissionLineInterpolator for line list at filename
 #line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
 # TODO alter path for zaratan
-line_list = os.path.join(os.getcwd(), 'merlin_spectra/linelists/linelist-all.dat')
-emission_interpolator = EmissionLineInterpolator(line_list, lines)
+line_list = os.path.join(os.getcwd(), '../src/merlin_spectra/linelists/linelist-all.dat')
+emission_interpolator = merlin.EmissionLineInterpolator(line_list, lines)
 
 # Add flux and luminosity fields for all lines in the list
 for i, line in enumerate(lines):
@@ -304,7 +305,7 @@ Run routines on data
 -------------------------------------------------------------------------------
 '''
 
-viz = galaxy_visualization.VisualizationManager(filename, lines, wavelengths)
+viz = merlin.galaxy_visualization.VisualizationManager(filename, lines, wavelengths)
 star_ctr = viz.star_center(ad)
 sp = ds.sphere(star_ctr, (3000, "pc"))
 sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
@@ -366,6 +367,7 @@ lims_fiducial_00319 = {
     ('ramses', 'xHeII'): [1e-4, 1e-1],
     ('ramses', 'xHeIII'): [1e-5, 1e-1],
     ('gas', 'flux_H1_6562.80A'): [1e-9, 1e-2],
+    ('gas', 'flux_H1_4861.35A'): [1e-9, 1e-2],
     ('gas', 'flux_O1_1304.86A'): [6e-17, 5e-10],
     ('gas', 'flux_O1_6300.30A'): [6e-13, 2e-8],
     ('gas', 'flux_O2_3728.80A'): [5e-12, 5e-7],
