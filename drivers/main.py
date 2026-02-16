@@ -11,6 +11,11 @@ import merlin_spectra as merlin
 #from merlin.emission import EmissionLineInterpolator
 #from merlin import galaxy_visualization
 
+from importlib.resources import files, as_file
+
+p = files("merlin_spectra") / "linelists"
+print(list(p.iterdir()))
+
 '''
 main.py
 
@@ -33,6 +38,8 @@ given a filepath for a Cloudy-generated line flux list/data table.
 # TODO new hydrofile versions
 # TODO change lims dict to field format
 # TODO alternative shell script
+
+
 
 
 filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
@@ -260,6 +267,15 @@ else:
 # Instance of EmissionLineInterpolator for line list at filename
 #line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
 # TODO alter path for zaratan
+
+#resource = files("merlin_spectra") / "linelists" / "linelist-all.dat"
+
+#with as_file(resource) as path:
+#    print(path)         # a pathlib.Path
+#    print(str(path))    # string path if you need it
+#    line_list = str(path)
+#    emission_interpolator = merlin.EmissionLineInterpolator(line_list, lines)
+
 line_list = os.path.join(os.getcwd(), '../src/merlin_spectra/linelists/linelist-all.dat')
 emission_interpolator = merlin.EmissionLineInterpolator(line_list, lines)
 

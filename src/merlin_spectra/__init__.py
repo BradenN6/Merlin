@@ -1,4 +1,4 @@
-__version__ = "0.0.5"
+__version__ = "0.0.7"
 
 from .emission import EmissionLineInterpolator
 from .galaxy_visualization import VisualizationManager

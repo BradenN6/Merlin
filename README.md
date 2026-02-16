@@ -29,8 +29,11 @@ CloudyFiles/gridrun-09-02-2026/LineList_NebularCN.dat (can be adjusted)
 from a 1 cm thick gas cell. The exact conditions can be adjusted (the star
 SED, for instance) for a given run; a simulation for every combination of the
 varying parameters is performed. Line list data is output in
-'LineList_NebularCN.dat' and 'LineList_NebularO.dat', then combined into a
-single 'linelist.dat' file via 'combine_tables.py'.
+'LineList_NebularCN.dat' and 'LineList_NebularO.dat'. 
+Add a header to both with limits of U (ionisation parameter), 
+N (H number density), T (temperature), such as 
+"-9.0 2.0 0.5 -4.0 7.0 0.5 1.0 8.0 0.2", based on the input file.
+Combine into a single 'linelist.dat' file via 'combine_tables.py'.
 
 See CloudyFiles/gridrun-09-02-2026. interp6.in is the input file. The run file (with
 executable privilege) can be used in your installation of Cloudy.
@@ -38,7 +41,12 @@ For instance, in the terminal, './run interp6' would run the desired
 simulations (note that grid runs require the use of the -r option, present
 in 'run', and therefore the input file is given as interp6, ommitting .in.)
 
+
 #### Running Merlin on RAMSES-RT Output Data
+
+Either use the source files themselves or 
+'python3 -m pip install merlin-spectra'. With the latter, 'main.py' can be
+run with a simple 'import merlin_spectra'.
 
 'main.py' outlines the process: create derived field functions; load
 the simulation given by the filepath (as a command line argument) pointing to
@@ -47,6 +55,10 @@ EmissionLineInterpolator object for the derived flux and luminosity
 fields using the desired 'linelist.dat' table; instantiate a
 VisualizationManager object; and run the desired routines/analysis for the
 time slice.
+
+NOTICE: Store the 'linelist-all.dat' file locally and update the path in
+main.py. This will be updated soon to use data files from within the 
+imported package source.
 
 The class structures allow for easy testing of new features and updates.
 One must call save_sim_info() for Object variables like current_redshift
