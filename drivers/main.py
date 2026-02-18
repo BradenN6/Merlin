@@ -33,30 +33,32 @@ given a filepath for a Cloudy-generated line flux list/data table.
 
 '''
 
-# TODO docstrings
-# TODO change to use mytemperature
-# TODO new hydrofile versions
-# TODO change lims dict to field format
-# TODO alternative shell script
-
-
-
+'''
+--------------
+Initialisation
+--------------
+'''
 
 filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
 #filename = sys.argv[1]
-#print(f'Line List Filepath = {filename}')
+print(f'RAMSES-RT Data Filepath = {filename}')
 
+# List of lines in Cloudy Table
 lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
        "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
        "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
        "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
        "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
+# Associated wavelengths
 wavelengths=[6562.80, 4861.35, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81, 
              1666.15, 4363.21, 4958.91, 5006.84, 1640.41, 1335.66, 1906.68, 
              1908.73, 1549.00, 2795.53, 2802.71, 3868.76, 3967.47, 1238.82, 
              1242.80, 1486.50, 1749.67, 6716.44, 6730.82]
 
+# Fields present in RAMSES-RT Output
+# NOTE: Requires reading in the updated hydro_file_descriptor.txt
+# TODO check updated form
 cell_fields = [
     "Density",
     "x-velocity",
@@ -70,6 +72,7 @@ cell_fields = [
     "xHeIII",
 ]
 
+# Extra Particle Fields
 epf = [
     ("particle_family", "b"),
     ("particle_tag", "b"),
@@ -77,14 +80,18 @@ epf = [
     ("particle_metallicity", "d"),
 ]
 
+###################
+# Derived Field Definitions
+###################
+
 # Ionization Parameter Field
 # Based on photon densities in bins 2-4
-# Don't include bin 1 -> Lyman Werner non-ionizing
+# Don't include bin 1 -> Lyman Werner, non-ionizing
 def _ion_param(field, data):
     p = RTFieldFileHandler.get_rt_parameters(ds).copy()
     p.update(ds.parameters)
 
-    cgs_c = 2.99792458e10     #light velocity
+    cgs_c = 2.99792458e10     # light velocity
 
     # Convert to physical photon number density in cm^-3
     pd_2 = data['ramses-rt','Photon_density_2']*p["unit_pf"]/cgs_c
@@ -97,11 +104,12 @@ def _ion_param(field, data):
 
 
 def _my_temperature(field, data):
-    #y(i): abundance per hydrogen atom
-    XH_RAMSES=0.76 #defined by RAMSES in cooling_module.f90
-    YHE_RAMSES=0.24 #defined by RAMSES in cooling_module.f90
-    mH_RAMSES=yt.YTArray(1.6600000e-24,"g") #defined by RAMSES in cooling_module.f90
-    kB_RAMSES=yt.YTArray(1.3806200e-16,"erg/K") #defined by RAMSES in cooling_module.f90
+    # A more accurate temperature field
+    # y(i): abundance per hydrogen atom
+    XH_RAMSES=0.76 # defined by RAMSES in cooling_module.f90
+    YHE_RAMSES=0.24 # defined by RAMSES in cooling_module.f90
+    mH_RAMSES=yt.YTArray(1.6600000e-24,"g") # defined by RAMSES in cooling_module.f90
+    kB_RAMSES=yt.YTArray(1.3806200e-16,"erg/K") # defined by RAMSES in cooling_module.f90
 
     dn=data["ramses","Density"].in_cgs()
     pr=data["ramses","Pressure"].in_cgs()
@@ -113,20 +121,23 @@ def _my_temperature(field, data):
     yH2=1.-yHI-yHII
     yel=yHII+yHeII+2*yHeIII
     mu=(yHI+yHII+2.*yH2 + 4.*yHe) / (yHI+yHII+yH2 + yHe + yel)
+
     return pr/dn * mu * mH_RAMSES / kB_RAMSES
 
 
-#number density of hydrogen atoms
 def _my_H_nuclei_density(field, data):
+    # number density of hydrogen atoms
+
     dn=data["ramses","Density"].in_cgs()
-    XH_RAMSES=0.76 #defined by RAMSES in cooling_module.f90
-    YHE_RAMSES=0.24 #defined by RAMSES in cooling_module.f90
-    mH_RAMSES=yt.YTArray(1.6600000e-24,"g") #defined by RAMSES in cooling_module.f90
+    XH_RAMSES=0.76 # defined by RAMSES in cooling_module.f90
+    YHE_RAMSES=0.24 # defined by RAMSES in cooling_module.f90
+    mH_RAMSES=yt.YTArray(1.6600000e-24,"g") # defined by RAMSES in cooling_module.f90
 
     return dn*XH_RAMSES/mH_RAMSES
 
 
 def _OII_ratio(field, data):
+    # Local OII Ratio -- Diagnost of TODO
     # TODO lum or flux?
     #return data['gas', 'flux_O2_3728.80A']/data['gas', 'flux_O2_3726.10A']
     flux1 = data['gas', 'flux_O2_3728.80A']
@@ -145,6 +156,7 @@ def _pressure(field, data):
         return data['ramses', 'hydro_thermal_pressure']
 
 
+# Hydrogen, Helium Ionisation Fractions
 def _xHI(field, data):
     if 'hydro_xHI' in dir(ds.fields.ramses): # and \
         #'xHI' not in dir(ds.fields.ramses):
@@ -177,6 +189,9 @@ Add Derived Fields
 '''
 
 ds = yt.load(filename, extra_particle_fields=epf)
+
+# NOTE: The derived field units automatically determined by yt
+# may be incorrect.
 
 ds.add_field(
     ("gas","number_density"),
@@ -230,14 +245,11 @@ ds.add_field(
     ("gas","my_temperature"),
     function=_my_temperature,
     sampling_type="cell",
-    # TODO units
-    #units="K",
-    #units="K*cm**3/erg",
     units='K*cm*dyn/erg',
     force_override=True
 )
 
-# Ionization parameter
+# Ionisation parameter
 ds.add_field(
     ('gas', 'ion_param'),
     function=_ion_param,
@@ -255,7 +267,11 @@ ds.add_field(
 )
 
 
-# Normalize by Density Squared Flag
+# Normalise by Density Squared Flag
+# If True, returned emissivities are normalised by the density squared.
+# Nebular emission lines typically scale as N^2
+# NOTE: nonphysical units due to yt's automatic determination
+# of derived field units
 dens_normalized = False
 if dens_normalized: 
     flux_units = '1/cm**6'
@@ -264,20 +280,18 @@ else:
     flux_units = '1'
     lum_units = 'cm**3'
 
-# Instance of EmissionLineInterpolator for line list at filename
-#line_list = os.path.join(os.getcwd(), 'data/linelist.dat')
-# TODO alter path for zaratan
+#####
+# Instance of EmissionLineInterpolator for line list
+#####
 
-#resource = files("merlin_spectra") / "linelists" / "linelist-all.dat"
+# To use a locally stored line list-----
+#line_list = os.path.join(os.getcwd(), '../src/merlin_spectra/linelists/linelist-all.dat')
+#emission_interpolator = merlin.EmissionLineInterpolator(lines, filename=line_list, use_import=False)
 
-#with as_file(resource) as path:
-#    print(path)         # a pathlib.Path
-#    print(str(path))    # string path if you need it
-#    line_list = str(path)
-#    emission_interpolator = merlin.EmissionLineInterpolator(line_list, lines)
-
-line_list = os.path.join(os.getcwd(), '../src/merlin_spectra/linelists/linelist-all.dat')
-emission_interpolator = merlin.EmissionLineInterpolator(line_list, lines)
+# To use a line list in the merlin package source----
+# NOTE: linelist-all.dat updated to include HBeta
+emission_interpolator = merlin.EmissionLineInterpolator(lines, filename=None,
+                 use_import=True, linelist_name="linelist-all.dat")
 
 # Add flux and luminosity fields for all lines in the list
 for i, line in enumerate(lines):
@@ -321,7 +335,10 @@ Run routines on data
 -------------------------------------------------------------------------------
 '''
 
+# Create a visualization object
 viz = merlin.galaxy_visualization.VisualizationManager(filename, lines, wavelengths)
+
+# Star centre of mass; sphere objects; window width
 star_ctr = viz.star_center(ad)
 sp = ds.sphere(star_ctr, (3000, "pc"))
 sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
@@ -334,6 +351,7 @@ viz.calc_luminosities(sp)
 
 # Projection and Slice Plots
 
+# Limits for movie-making/scale consistency
 '''
 lims_00273 = {
     'Ionization Parameter': [10e-7, 10e-1],
@@ -459,10 +477,17 @@ title_list.append(r'H$\alpha$_6562.80A'.replace('_', ' ') +
                   r' Flux [erg s$^{-1}$ cm$^{-2}$]')
 weight_field_list.append(None)
 
+field_list.append(('gas', 'flux_'  + 'H1_4861.35A'))
+title_list.append(r'H$\beta$_4861.35A'.replace('_', ' ') + 
+                  r' Flux [erg s$^{-1}$ cm$^{-2}$]')
+weight_field_list.append(None)
+
 
 for line in lines:
     if line == 'H1_6562.80A':
         line_title = r'H$\alpha$_6562.80A'
+    elif line == 'H1_4861.35A':
+        line_title = r'H$\beta$_4861.35A'
     else:
         line_title = line
 
@@ -517,7 +542,6 @@ viz.phase_with_profiles(ds, sp, phase_profile, x_field=('gas', 'my_temperature')
 viz.spectra_driver(ds, 1000, 1e-25)
 # TODO lum_lims
 
-
 line_title = r'H$\alpha$_6562.80A'
 
 # Cumulative Flux Plot
@@ -538,3 +562,7 @@ viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # TODO phase plot lims, annotation, more phases
 # TODO change title and axis font sizes
 # TODO total on phase profile
+# TODO docstrings
+# TODO new hydrofile versions
+
+

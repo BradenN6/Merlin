@@ -2,6 +2,8 @@ import copy
 import numpy as np
 from scipy.interpolate import RegularGridInterpolator
 
+from importlib.resources import files, as_file
+
 '''
 emission.py
 
@@ -38,7 +40,8 @@ line (e.g. line 0 = HII, density normalized):
 # TODO docstrings
 
 class EmissionLineInterpolator:
-    def __init__(self, filename: str, lines):
+    def __init__(self, lines, filename: str=None,
+                 use_import=True, linelist_name="linelist-all.dat"):
         '''
         Initializes the interpolator with line list loaded from the given 
         filename/filepath.
@@ -60,6 +63,8 @@ class EmissionLineInterpolator:
 
         self.filename = filename
         self.lines = lines
+        self.use_import = use_import
+        self.linelist_name = linelist_name
         self._load_data()
         self._reconfigure_data_cube()
         self._create_interpolators()
@@ -71,18 +76,36 @@ class EmissionLineInterpolator:
         '''
 
         # Read line emission data (line list, run params)
-        minU, maxU, stepU, minN, maxN, stepN, minT, maxT, stepT = \
+        if not self.use_import:
+            minU, maxU, stepU, minN, maxN, stepN, minT, maxT, stepT = \
             np.loadtxt(self.filename, unpack=True, dtype=float, max_rows=1, 
                        skiprows=5)
+
+            self.ll = np.loadtxt(self.filename, unpack=True, dtype=float, 
+                                skiprows=7)
+        else:
+            resource = files("merlin_spectra") / "linelists" / "linelist-all.dat"
+
+            # path exists within the with block
+            with as_file(resource) as path:
+                print(path)         # a pathlib.Path
+                print(str(path))    # string path
+                linelist_path = str(path)
+
+                minU, maxU, stepU, minN, maxN, stepN, minT, maxT, stepT = \
+                np.loadtxt(linelist_path, unpack=True, dtype=float, max_rows=1, 
+                        skiprows=5)
+
+                self.ll = np.loadtxt(linelist_path, unpack=True, dtype=float, 
+                                skiprows=7)
+                
         self.minU, self.maxU, self.stepU = minU, maxU, stepU
         self.minN, self.maxN, self.stepN = minN, maxN, stepN
         self.minT, self.maxT, self.stepT = minT, maxT, stepT
         print(f'minU={self.minU}, maxU={self.maxU}, stepU={self.stepU}, ' +
               f'minN={self.minN}, maxN={self.maxN}, stepN={self.stepN}, ' +
               f'minT={self.minT}, maxT={self.maxT}, stepT={self.stepT}')
-        
-        self.ll = np.loadtxt(self.filename, unpack=True, dtype=float, 
-                             skiprows=7)
+
         print(f'Line List Shape = {self.ll.shape}')
 
 

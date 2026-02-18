@@ -1144,10 +1144,8 @@ class VisualizationManager:
 
 
 # sp.quantities.center_of_mass(use_gas=False, use_particles=True, particle_type="star")
-
 # TODO change z label on plots annotation, sig figs
 # TODO docstrings
-
 # TODO linear profile plots
 # annotate total emission/sum
 # TODO or density normalization
