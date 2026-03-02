@@ -7,7 +7,7 @@ from importlib.resources import files, as_file
 '''
 emission.py
 
-Author: Braden Marazzo-Nowicki
+Author: Braden J. Marazzo-Nowicki
 
 Generate line emission fields from a Cloudy-generated linelist table.
 
@@ -35,9 +35,9 @@ line (e.g. line 0 = HII, density normalized):
     line_emission_function = \
         emission_interpolator.get_line_emission(0, dens_normalized=True)
 
+        
+Last Updated (DD-MM-YYYY): 01-03-2026
 '''
-
-# TODO docstrings
 
 class EmissionLineInterpolator:
     def __init__(self, lines, filename: str=None,
@@ -46,7 +46,7 @@ class EmissionLineInterpolator:
         Initializes the interpolator with line list loaded from the given 
         filename/filepath.
         
-        Parameters:
+        Parameters
         -----------
         filename (str): The name/path of the file to load the line emission 
         data from. This contains a text table. A commented (unread) header
@@ -174,13 +174,13 @@ class EmissionLineInterpolator:
         Returns the interpolator for the specified line and normalization 
         option.
         
-        Parameters:
+        Parameters
         -----------
         lineidx (int): Index of the emission line.
         dens_normalized (bool): Flag - whether to use the density squared 
         normalized interpolator.
         
-        Returns:
+        Returns
         --------
         RegularGridInterpolator: The corresponding interpolator object.
         '''
@@ -195,13 +195,13 @@ class EmissionLineInterpolator:
         Returns a function for line emission of index idx.
         Allows for the batch creation of flux derived fields for various lines.
         
-        Parameters:
+        Parameters
         -----------
         idx (int): The index of the emission line.
         dens_normalized (bool): Flag - whether to use the density squared 
         normalized version.
         
-        Returns:
+        Returns
         --------
         function: A function that calculates the emission as a derived field.
         The data parameter represents simulation data loaded into yt.

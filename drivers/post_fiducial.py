@@ -34,3 +34,7 @@ df_path = os.path.join(os.getcwd(), "CC-Fiducial_post_analysis/analysis_data.csv
 df = pd.read_csv(df_path)
 
 simpost.lvz(df, lines, group_species=True)
+
+# TODO plot with star particle aggregate mass
+# TODO massimo code
+# TODO distribution of densities contributing to ratio/line

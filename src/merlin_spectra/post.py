@@ -1,8 +1,3 @@
-'''
-Suite of functions for performing analysis on data
-output from many time slices.
-'''
-
 import glob
 import numpy as np
 import pandas as pd
@@ -12,13 +7,18 @@ import re
 import itertools
 from collections import defaultdict
 
-# TODO init to make object from csv
+'''
+post.py
 
-# TODO read in lines avail
-lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3_1660.81A",
-       "O3_1666.15A","O3_4363.21A","O3_4958.91A","O3_5006.84A", "He2_1640.41A","C2_1335.66A",
-       "C3_1906.68A","C3_1908.73A","C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A",
-       "Ne3_3967.47A","N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
+Author: Braden J. Marazzo-Nowicki
+
+Suite of functions for performing analysis on data
+output from many time slices.
+
+Last Updated (DD-MM-YYYY): 01-03-2026
+'''
+
+# TODO init to make object from csv
 
 def check_file_pattern(folder_path, pattern):
     '''Checks if a file matching the pattern exists in the folder.'''
@@ -33,7 +33,7 @@ class SimulationPostAnalysis:
 
     main_table = pd.DataFrame()
 
-    def __init__(self, sim_titl:str, data_path:str):
+    def __init__(self, sim_titl:str, data_path:str, lines):
         '''
         data_path: path to folder with information files
         sim_titl: str referring to simulation
@@ -57,11 +57,11 @@ class SimulationPostAnalysis:
         """
         Returns an ordered list of files matching the given pattern.
 
-        Parameters:
+        Parameters
         -----------
         pattern (str): The glob-style pattern to match.
 
-        Returns:
+        Returns
         --------
         A list of file paths, sorted alphabetically.
         """
@@ -111,8 +111,6 @@ class SimulationPostAnalysis:
     def populate_table(self):
         '''
         Populate main_table with simulation information at each time slice.
-
-        
         '''
 
         data_rows = []
@@ -183,11 +181,6 @@ class SimulationPostAnalysis:
         return df
 
 
-
-        temp_min_pattern = fr'{field}_min: [-+]?\d*\.\d+([eE][-+]?\d+)?'
-        temp_min = float(re.search(temp_min_pattern, file_content).group(1))
-
-
     def lvz(self, df, lines, group_species=True):
         '''
         TODO
@@ -253,17 +246,6 @@ class SimulationPostAnalysis:
         else:
             plt.savefig(os.path.join(self.directory, 'lvz.png'))
 
-    
-    
-
-
-
-
-
-    #def lvz(self):
-    #    '''
-    #    Luminosity vs. Redshift
-    #    '''
 
 
 '''
@@ -298,7 +280,6 @@ plt.grid(True)
 plt.tight_layout()
 plt.savefig("plot.png")
 plt.show()
-
 '''
 
     

@@ -58,7 +58,6 @@ wavelengths=[6562.80, 4861.35, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81,
 
 # Fields present in RAMSES-RT Output
 # NOTE: Requires reading in the updated hydro_file_descriptor.txt
-# TODO check updated form
 cell_fields = [
     "Density",
     "x-velocity",
@@ -124,7 +123,6 @@ def _my_temperature(field, data):
 
     return pr/dn * mu * mH_RAMSES / kB_RAMSES
 
-
 def _my_H_nuclei_density(field, data):
     # number density of hydrogen atoms
 
@@ -135,9 +133,16 @@ def _my_H_nuclei_density(field, data):
 
     return dn*XH_RAMSES/mH_RAMSES
 
+def _my_He_number_density(field, data):
+    dn=data["ramses","Density"].in_cgs()
+    XH_RAMSES=0.76 # defined by RAMSES in cooling_module.f90
+    YHE_RAMSES=0.24 # defined by RAMSES in cooling_module.f90
+    mHe_RAMSES=yt.YTArray(6.64600000e-24,"g") # TODO
+
+    return dn*YHE_RAMSES/mHe_RAMSES
 
 def _OII_ratio(field, data):
-    # Local OII Ratio -- Diagnost of TODO
+    # Local OII Ratio -- Diagnostic of TODO
     # TODO lum or flux?
     #return data['gas', 'flux_O2_3728.80A']/data['gas', 'flux_O2_3726.10A']
     flux1 = data['gas', 'flux_O2_3728.80A']
@@ -148,7 +153,6 @@ def _OII_ratio(field, data):
     ratio = flux1 / flux2
 
     return ratio
-
 
 def _pressure(field, data):
     if 'hydro_thermal_pressure' in dir(ds.fields.ramses): # and 
@@ -179,6 +183,39 @@ def _xHeIII(field, data):
     if 'hydro_xHeIII' in dir(ds.fields.ramses): # and \
         #'xHeIII' not in dir(ds.fields.ramses):
         return data['ramses', 'hydro_xHeIII']
+
+
+# TODO electron number density
+def _electron_number_density_H(field, data):
+    # Total gas density in cm^-3
+    #return data["gas", "HII"] * data["gas", "density"] / (1.67e-24) # units of cm^-3
+    return data["ramses", "xHII"] * data["gas", "my_H_nuclei_density"] 
+
+
+def _electron_number_density(field, data):
+    # Total Hydrogen number density (approximate, assuming H is most of the mass)
+    # Using 'number_density'
+    # Or, calculate from rho and H mass fraction: nH = rho * X / m_p
+    
+    # Get H and He ionization fractions (HII=H+/H, HeII=He+/He, HeIII=He++/He)
+    #h_p1 = data["ramses", "xHII"]
+    #he_p1 = data["ramses", "xHeII"]
+    #he_p2 = data["ramses", "xHeIII"]
+    
+    # Total gas density in number density (n_H + n_He + n_e)
+    # 'gas', 'number_density'. 
+    # Alternatively, use 'density' / (1.4 * m_p) for default mix.
+    # 'number_density' as total atom+ion number density
+    #nH_plus_nHe = data["gas", "number_density"]
+    
+    # Typical primordial abundances: X=0.76, Y=0.24. 
+    # Number fraction of He is nHe/nH = (Y/4) / (X/1) = Y / (4X)
+    # Roughly nHe/nH ~ 1/12.4
+    
+    # electron_density = nH * xHII + nHe * xHeII + 2 * nHe * xHeIII
+    return data["gas", "my_H_nuclei_density"] * data["ramses", "xHII"] + \
+        data["gas", "my_He_number_density"] * (data["ramses", "xHeII"] + \
+                                            2 * data["ramses", "xHeIII"])
 
 
 '''
@@ -266,6 +303,30 @@ ds.add_field(
     force_override=True
 )
 
+ds.add_field(
+    ("gas","my_He_number_density"),
+    function=_my_He_number_density,
+    sampling_type="cell",
+    units="1/cm**3",
+    force_override=True
+)
+
+# electron number density
+ds.add_field(
+    ("gas", "electron_number_density_H"), 
+    function=_electron_number_density_H, 
+    sampling_type="cell", 
+    units="cm**-3",
+    force_override=True
+)
+
+ds.add_field(
+    ("gas", "electron_number_density"),
+    function=_electron_number_density,
+    sampling_type="cell",
+    units="cm**-3"
+)
+
 
 # Normalise by Density Squared Flag
 # If True, returned emissivities are normalised by the density squared.
@@ -336,7 +397,7 @@ Run routines on data
 '''
 
 # Create a visualization object
-viz = merlin.galaxy_visualization.VisualizationManager(filename, lines, wavelengths)
+viz = merlin.galaxy_visualization.VisualizationManager(filename, lines, wavelengths, ds=ds, ad=ad)
 
 # Star centre of mass; sphere objects; window width
 star_ctr = viz.star_center(ad)
@@ -425,7 +486,10 @@ lims_fiducial_00319 = {
     ('gas', 'flux_N4_1486.50A'): [1e-18, 1e-12],
     ('gas', 'flux_N3_1749.67A'): [1e-14, 5e-10],
     ('gas', 'flux_S2_6716.44A'): [1e-12, 5e-7],
-    ('gas', 'flux_S2_6730.82A'): [1e-14, 1e-7]
+    ('gas', 'flux_S2_6730.82A'): [1e-14, 1e-7],
+    #('gas', 'my_He_number_density') : [],
+    #('gas', 'electron_number_density'): [],
+    #('gas', 'electron_number_density_H'): [],
 }
 
 # TODO lims
@@ -442,9 +506,15 @@ field_list = [
     ('ramses', 'xHII'),
     ('ramses', 'xHeII'),
     ('ramses', 'xHeIII'),
+    ('gas', 'my_He_number_density'),
+    ('gas', 'electron_number_density'),
+    ('gas', 'electron_number_density_H'),
 ]
 
 weight_field_list = [
+    ('gas', 'my_H_nuclei_density'),
+    ('gas', 'my_H_nuclei_density'),
+    ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
     ('gas', 'my_H_nuclei_density'),
@@ -470,6 +540,9 @@ title_list = [
     r'X$_{\text{HII}}$',
     r'X$_{\text{HeII}}$',
     r'X$_{\text{HeIII}}$',
+    r'He Number Density [cm$^{-3}$]',
+    r'Electron Number Density [cm$^{-3}$]',
+    r'Electron Number Density (approximate) [cm$^{-3}$]',
 ]
 
 field_list.append(('gas', 'flux_'  + 'H1_6562.80A'))
@@ -502,9 +575,9 @@ for line in lines:
     #weight_field_list.append(None)
 
 
-viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
-                     weight_field_list, title_list, proj=True, slc=False,
-                     lims_dict=lims_fiducial_00319)
+#viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
+#                     weight_field_list, title_list, proj=True, slc=False,
+#                     lims_dict=lims_fiducial_00319)
 
 viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
                      weight_field_list, title_list, proj=True, slc=False,
@@ -560,9 +633,10 @@ viz.star_gas_overlay(ds, ad, sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # TODO OII ratio
 # TODO lims - fix dicts
 # TODO phase plot lims, annotation, more phases
+# TODO save as fits files
 # TODO change title and axis font sizes
 # TODO total on phase profile
 # TODO docstrings
-# TODO new hydrofile versions
 
-
+# TODO array of data for proj plots - plot in matplotlib
+# units -> observed surface brightness

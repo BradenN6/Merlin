@@ -3,7 +3,7 @@ Merlin
 Nebular Line Emission Diagnostics from Cosmological Simulations of 
 Early Universe Galaxies.
 
-Author: Braden Nowicki
+Author: Braden Marazzo-Nowicki
 Advisor: Dr. Massimo Ricotti
 
 Interface with Cloudy Photoionization Code data and RAMSES-RT Simulation
@@ -31,6 +31,7 @@ MERLIN
 |   |   |           maxT, stepT
 |   |   |-- linelist.dat : -6.0 1.0 0.5 -1.0 6.0 0.5 3.0 6.0 0.1
 |   |   |-- linelist2.dat : -9.0 2.0 0.5 -4.0 7.0 0.5 1.0 8.0 0.2
+|   |   |-- linelist-all.dat : -9.0 2.0 0.5 -4.0 7.0 0.5 1.0 8.0 0.2
 
 
 Dependencies:
