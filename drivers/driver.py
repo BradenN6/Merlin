@@ -39,6 +39,8 @@ sp = ds.sphere(star_ctr, (3000, "pc"))
 sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
 width = (1500, 'pc')
 
+print(star_ctr)
+
 # Save Simulation Information
 viz.save_sim_info()
 #viz.calc_luminosities(sp)
@@ -94,7 +96,6 @@ title_list = [
     r'X$_{\text{HeIII}}$',
     r'He Number Density [cm$^{-3}$]',
     r'Electron Number Density [cm$^{-3}$]',
-    r'Electron Number Density (approximate) [cm$^{-3}$]',
 ]
 
 #field_list.append(('gas', 'flux_'  + 'H1_6562.80A'))
@@ -121,7 +122,7 @@ for line in lines:
     weight_field_list.append(None)
 
 
-viz.plot_wrapper(ds, sp, width, star_ctr, field_list,
+viz.plot_wrapper(sp, width, star_ctr, field_list,
                      weight_field_list, title_list, proj=True, slc=False,
                      lims_dict=lims_fiducial_00319)
 
@@ -215,135 +216,9 @@ phase_config_list = [
     },
 ]
 
-
-#phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(sp, x_field=('gas', 'my_temperature'),
-#               y_field=('gas', 'my_H_nuclei_density'), z_field=('gas', 'flux_H1_6562.80A'),
-#               extrema=extrema, x_label='Temperature [K]', 
-#               y_label=r'H Nuclei Number Density [cm$^{-3}$]', 
-#               z_label=line_title.replace('_', ' ') + 
-#                      r' Flux [erg s$^{-1}$ cm$^{-2}$]')
-
-#viz.phase_with_profiles(x_field=('gas', 'my_temperature'),
-#                        y_field=('gas', 'my_H_nuclei_density'),
-#                        z_field=('gas', 'flux_H1_6562.80A'),
-#                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
-#                        x_label='Temperature [K]',
-#                        y_label=r'H Nuclei Number Density [cm$^{-3}$]',
-#                        z_label=line_title.replace('_', ' ') + 
-#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', linear=True)
-
-extrema = {('gas', 'my_temperature'): (1e3, 1e8),
-           ('gas', 'electron_number_density'): (0.5e-2, 1e5),
-           ('gas', 'flux_H1_6562.80A'): (1e-20, 1e-14)}
-
-phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(sp, x_field=('gas', 'my_temperature'),
-               y_field=('gas', 'electron_number_density'), z_field=('gas', 'flux_H1_6562.80A'),
-               extrema=extrema, x_label='Temperature [K]', 
-               y_label=r'Electron Number Density [cm$^{-3}$]', 
-               z_label=line_title.replace('_', ' ') + 
-                         r' Flux [erg s$^{-1}$ cm$^{-2}$]')
-
-viz.phase_with_profiles(x_field=('gas', 'my_temperature'),
-                        y_field=('gas', 'electron_number_density'),
-                        z_field=('gas', 'flux_H1_6562.80A'),
-                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
-                        x_label='Temperature [K]', 
-                        y_label=r'Electron Number Density [cm$^{-3}$]', 
-                        z_label=line_title.replace('_', ' ') + 
-                       r' Flux [erg s$^{-1}$ cm$^{-2}$]', linear=True)
-
-# TODO other lines
-
-extrema = {('gas', 'my_temperature'): (1e3, 1e8),
-           ('gas', 'electron_number_density'): (1e-3, 1e5),
-           ('gas', 'mass'): (0.5e30, 1.5e40)}
-
-sp_mass = ds.sphere(star_ctr, (300, "pc"))
-
-phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(sp_mass, x_field=('gas', 'my_temperature'),
-               y_field=('gas', 'electron_number_density'), z_field=('gas', 'mass'),
-               extrema=extrema, x_label='Temperature [K]', 
-               y_label=r'Electron Number Density [cm$^{-3}$]', 
-               z_label='Mass')
-
-viz.phase_with_profiles(x_field=('gas', 'my_temperature'),
-                        y_field=('gas', 'electron_number_density'),
-                        z_field=('gas', 'mass'),
-                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
-                        x_label='Temperature [K]', 
-                        y_label=r'Electron Number Density [cm$^{-3}$]', 
-                        z_label='Mass', linear=True)
-
-extrema = {('gas', 'my_temperature'): (1e3, 1e8),
-           ('gas', 'my_H_nuclei_density'): (1e-4, 1e6),
-           ('gas', 'mass'): (0.5e30, 1.5e40)}
-
-sp_mass = ds.sphere(star_ctr, (300, "pc"))
-
-phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(sp_mass, x_field=('gas', 'my_temperature'),
-               y_field=('gas', 'my_H_nuclei_density'), z_field=('gas', 'mass'),
-               extrema=extrema, x_label='Temperature [K]', 
-               y_label=r'H Nuclei Number Density [cm$^{-3}$]', 
-               z_label='Mass')
-
-viz.phase_with_profiles(x_field=('gas', 'my_temperature'),
-                        y_field=('gas', 'my_H_nuclei_density'),
-                        z_field=('gas', 'mass'),
-                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
-                        x_label='Temperature [K]', 
-                        y_label=r'H Nuclei Number Density [cm$^{-3}$]', 
-                        z_label='Mass', linear=True)
-
-#('gas', 'flux_C3_1906.68A'):            (1e-15, 5e-8),
-#    ('gas', 'flux_C3_1908.73A'):            (1e-15, 5e-8),
-
-extrema = {('gas', 'my_temperature'): (1e3, 1e8),
-           ('gas', 'electron_number_density'): (1e-3, 1e5),
-           ('gas', 'flux_C3_1906.68A'): (1e-15, 5e-8)}
-
-line_title = 'C3_1906.68A'
-
-phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(sp, x_field=('gas', 'my_temperature'),
-               y_field=('gas', 'electron_number_density'), z_field=('gas', 'flux_C3_1906.68A'),
-               extrema=extrema, x_label='Temperature [K]', 
-               y_label=r'Electron Number Density [cm$^{-3}$]', 
-               z_label=line_title.replace('_', ' ') + 
-                      r' Flux [erg s$^{-1}$ cm$^{-2}$]')
-
-viz.phase_with_profiles(x_field=('gas', 'my_temperature'),
-                        y_field=('gas', 'electron_number_density'),
-                        z_field=('gas', 'flux_C3_1906.68A'),
-                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
-                        x_label='Temperature [K]',
-                        y_label=r'Electron Number Density [cm$^{-3}$]',
-                        z_label=line_title.replace('_', ' ') + 
-                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', linear=True)
+viz.phase_plot_wrapper(sp, phase_config_list)
 
 
-#('gas', 'flux_O2_3728.80A'):            (5e-12, 5e-7),
-#    ('gas', 'flux_O2_3726.10A'):            (5e-12, 5e-7),
-
-extrema = {('gas', 'my_temperature'): (1e3, 1e8),
-           ('gas', 'electron_number_density'): (1e-3, 1e5),
-           ('gas', 'flux_O2_3728.80A'): (5e-12, 5e-7)}
-
-line_title = 'O2_3728.80A'
-
-phase_profile, x_vals, y_vals, z_vals = viz.phase_plot(sp, x_field=('gas', 'my_temperature'),
-               y_field=('gas', 'electron_number_density'), z_field=('gas', 'flux_O2_3728.80A'),
-               extrema=extrema, x_label='Temperature [K]', 
-               y_label=r'Electron Number Density [cm$^{-3}$]', 
-               z_label=line_title.replace('_', ' ') + 
-                      r' Flux [erg s$^{-1}$ cm$^{-2}$]')
-
-viz.phase_with_profiles(x_field=('gas', 'my_temperature'),
-                        y_field=('gas', 'electron_number_density'),
-                        z_field=('gas', 'flux_O2_3728.80A'),
-                        x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
-                        x_label='Temperature [K]',
-                        y_label=r'Electron Number Density [cm$^{-3}$]',
-                        z_label=line_title.replace('_', ' ') + 
-                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', linear=True)
 
 
 # log-log plot
