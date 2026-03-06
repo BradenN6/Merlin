@@ -24,7 +24,7 @@ Author: Braden J. Marazzo-Nowicki
 
 Visualization and analysis routines for RAMSES-RT Simulations.
 
-Last Updated (DD-MM-YYYY): 01-03-2026
+Last Updated (DD-MM-YYYY): 03-03-2026
 '''
 
 
@@ -89,7 +89,7 @@ class VisualizationManager:
             Filename with info file appended '/info_00273.txt'
         directory : str
             Analysis output directory
-        redshift : 
+        redshift : float
             Current redshift.
 
         Returns
@@ -260,7 +260,7 @@ class VisualizationManager:
         yt_plot : yt.ProjectionPlot or yt.SlicePlot Object
         plot_type : str
             Type of plot (for filename) - 'proj' or 'slc'
-        field : tuple, str)
+        field : Tuple[str, str]
             field to plot, e.g. ('gas', 'temperature')
         width : tuple, int and str
             width in code units or formatted with units, e.g. (1500, 'pc')
@@ -287,8 +287,15 @@ class VisualizationManager:
 
         plot_title = f'{self.output_file}_{lbox}{length_unit}_' + \
             f'{field_comma}_{plot_type}'
+        
+        plt_path = os.path.join(self.directory, 'proj_slc_plots')
+        fits_path = os.path.join(plt_path, 'fits')
+        if not os.path.exists(plt_path):
+            os.makedirs(plt_path)
+        if not os.path.exists(fits_path):
+            os.makedirs(fits_path)
 
-        fname = os.path.join(self.directory, plot_title)
+        fname = os.path.join(plt_path, plot_title)
         if lims is not None:
             fname = fname + '_lims'
 
@@ -339,11 +346,13 @@ class VisualizationManager:
         plt.text(0.05, 0.05, f'z = {self.redshift:.5f}', color='white',
                  fontsize=9, ha='left', va='bottom',
                  transform=plt.gca().transAxes)
-        
+
+        fits_fname = os.path.join(fits_path, plot_title)
+
         # Save FITS file
         self.write_fits_image(
             p_img,
-            f"{fname}.fits",
+            f"{fits_fname}.fits",
             field=str(field),
             width=width,
             center=self.star_center(),
@@ -468,6 +477,9 @@ class VisualizationManager:
             Optionally specify; otherwise, use object-stored ad.
         '''
 
+        if ad is None:
+            ad = self.ad
+
         fields = [
             ('gas', 'temperature'),
             ('gas', 'density'),
@@ -550,12 +562,14 @@ class VisualizationManager:
         Parameters
         ----------
         sp: sphere data object to project within
-        width (tuple, int and str): width in code units or formatted with 
-            units, e.g. (1500, 'pc')
-        center (List, float): center (array of 3 values) in code units
-        field (tuple, str): field to project, e.g. ('gas', 'temperature')
-        weight_field (tuple, str): field to weight project (or None if 
-            unweighted)
+        width : Tuple[int, str]
+            width in code units or formatted with units, e.g. (1500, 'pc')
+        center : List(float)
+            center (array of 3 values) in code units
+        field : Tuple[str, str]
+            field to project, e.g. ('gas', 'temperature')
+        weight_field : Tuple[str, str]
+            field to weight project (or None if unweighted)
         ds : yt.Dataset
             loaded RAMSES-RT data set (optionally specify; otherwise use
             object-stored ds)
@@ -603,6 +617,9 @@ class VisualizationManager:
         yt.SlicePlot Object
         '''
 
+        if ds is None:
+            ds = self.ds
+
         slc = yt.SlicePlot(
                         ds, "z", field,
                         center=center,
@@ -611,7 +628,6 @@ class VisualizationManager:
 
         return slc
     
-
 
     def plot_wrapper(self, sp, width, center, field_list,
                      weight_field_list, title_list, ds=None, proj=True, slc=True,
@@ -639,7 +655,8 @@ class VisualizationManager:
             flag ProjectionPlot
         slc : bool
             flag for SlicePlot
-        lims_dict (None or Dict): dictionary of [vmin, vmax] fixed limits on
+        lims_dict : None or Dict
+            dictionary of [vmin, vmax] fixed limits on
             colorbar values for image if desired; otherwise None
 
         Returns
@@ -648,13 +665,16 @@ class VisualizationManager:
             list of 2D image arrays
         '''
 
-        redshift = ds.current_redshift
+        if ds is None:
+            ds = self.ds
+
+        redshift = self.redshift
 
         p_img_arr = []
 
         for i, field in enumerate(field_list):
             if proj:
-                p = self.proj_plot(ds, sp, width, center, field, 
+                p = self.proj_plot(sp, width, center, field, 
                                    weight_field_list[i])
                 
                 if lims_dict is None:
@@ -666,7 +686,7 @@ class VisualizationManager:
                                                 lims_dict[field])
 
             if slc:
-                p = self.slc_plot(ds, width, center, field)
+                p = self.slc_plot(width, center, field)
                 
                 if lims_dict == None:
                     p_img = self.convert_to_plt(p, 'slc', field, width,
@@ -689,7 +709,7 @@ class VisualizationManager:
         
         Parameters
         -----------
-        sp: sphere data object to project within
+        sp : sphere data object to project within
         x_field : Tuple[str, str]
             field to plot on the x-axis, i.e. ('gas', 'my_H_nuclei_density')
         y_field : Tuple[str, str]
@@ -721,8 +741,15 @@ class VisualizationManager:
 
         plot_title = f'{self.output_file}_' + \
             f'{x_field[1]}_{y_field[1]}_{z_field[1]}_phase.png'
+        
+        phase_path = os.path.join(self.directory, 'phase_plots')
+        #fits_path = os.path.join(plt_path, '/fits')
+        if not os.path.exists(phase_path):
+            os.makedirs(phase_path)
+        #if not os.path.exists(fits_path):
+        #    os.makedirs(fits_path)
 
-        fname = os.path.join(self.directory, plot_title)
+        fname = os.path.join(phase_path, plot_title)
 
         profile = yt.create_profile(
             sp,
@@ -759,6 +786,7 @@ class VisualizationManager:
         ax.set_ylabel(y_label)
         plot.save(fname)
 
+        # TODO save fits/data values
         return (phase_profile, x_vals, y_vals, z_vals)
 
 
@@ -782,11 +810,14 @@ class VisualizationManager:
             y values associated with phase plot
         z_vals : np.ndarray(float)
             z values associated with phase plot
-        x_label (str): label for x-axis
-        y_label (str): label for y-axis
-        z_label (str): label for colorbar
-        linear (bool): flag to plot profiles linear (True) or logarithmically
-            (False)
+        x_label : str
+            label for x-axis
+        y_label : str
+            label for y-axis
+        z_label : str
+            label for colorbar
+        linear : bool
+            flag to plot profiles linear (True) or logarithmically (False)
 
         Returns
         --------
@@ -798,8 +829,12 @@ class VisualizationManager:
 
         plot_title = f'{self.output_file}_' + \
                     f'{x_field[1]}_{y_field[1]}_{z_field[1]}_phase_profile.png'
+        
+        phase_path = os.path.join(self.directory, 'phase_plots')
+        if not os.path.exists(phase_path):
+            os.makedirs(phase_path)
 
-        fname = os.path.join(self.directory, plot_title)
+        fname = os.path.join(phase_path, plot_title)
 
         # Logarithmic scaling of the data
         x_vals = np.log10(x_vals)
@@ -895,6 +930,81 @@ class VisualizationManager:
         plt.savefig(fname, dpi=300)
         plt.close()
 
+        # TODO z extrema
+
+
+    def phase_plot_wrapper(self, sp, config_list):
+        '''
+        Generate a series of phase plots and phase plots with profiles.
+
+        Parameters
+        -----------
+        sp : sphere data object to project within
+        config_list : List[Dict]
+            A list of config Dicts with the following information:
+
+            x_field : Tuple[str, str]
+                field to plot on the x-axis, i.e. ('gas', 'my_H_nuclei_density')
+            y_field : Tuple[str, str]
+                field to plot on the y-axis, i.e. ('gas', 'my_temperature')
+            z_field : Tuple[str, str]
+                field to plot with colormap, i.e. ('gas', 'flux_H1_6562.80A')
+            x_label : str
+                label for x-axis
+            y_label : str
+                label for y-axis
+            z_label : str
+                label for colorbar
+            linear : bool
+                flag to plot profiles linear (True) or logarithmically (False)
+
+            Intermediate Values:
+            x_vals : np.ndarray(float)
+                x values associated with phase plot
+            y_vals : np.ndarray(float)
+                y values associated with phase plot
+            z_vals : np.ndarray(float)
+                z values associated with phase plot
+
+        Returns
+        --------
+        TODO
+        Add sp to config list
+        '''
+
+        for config in config_list:
+            x_field = config['x_field']
+            y_field = config['y_field']
+            z_field = config['z_field']
+            extrema = config['extrema']
+            x_label = config['x_label']
+            y_label = config['y_label']
+            z_label = config['z_label']
+            linear = config['linear']
+
+            phase_profile, x_vals, y_vals, z_vals = \
+                self.phase_plot(sp, 
+                    x_field=x_field,
+                    y_field=y_field,
+                    z_field=z_field,
+                    extrema=extrema,
+                    x_label=x_label, 
+                    y_label=y_label, 
+                    z_label=z_label)
+            
+            self.phase_with_profiles( 
+                    x_field=x_field,
+                    y_field=y_field,
+                    z_field=z_field,
+                    x_vals=x_vals, y_vals=y_vals, z_vals=z_vals,
+                    x_label=x_label, 
+                    y_label=y_label, 
+                    z_label=z_label,
+                    linear=linear
+            )
+
+        return phase_profile, x_vals, y_vals, z_vals
+
 
     def plot_cumulative_field(self, sp, fields, titles, fname,
                               idx_lims=None):
@@ -940,36 +1050,46 @@ class VisualizationManager:
         plt.close()
 
 
-    def star_gas_overlay(self, ds, ad, sp, center, width, field, gas_title,
-                         gas_flag=False, lims_dict=None):
+    def star_gas_overlay(self, sp, center, width, field, gas_title,
+                         gas_flag=False, lims_dict=None, ds=None, ad=None):
         '''
         Plot stellar density and, optionally, a field of the gas overlayed.
 
         Star + Gas Plot
         Adapted from work by Sarunyapat Phoompuang  
         
-        Parameters:
+        Parameters
         -----------
-        ds: loaded RAMSES-RT data set
-        sp: sphere data object to project within
-        center (List, float): center (array of 3 values) in code units
-        width (tuple, int and str): width in code units or formatted with 
-            units, e.g. (1500, 'pc')
-        field: TODO
-        gas_title (str): title for overlay plot, i.e.
-            r'H$\alpha$ Flux [$erg\: s^{-1}\: cm^{-2}$]'
-        gas_flag (bool): choose whether to plot gas overlay in addition
-            to stellar mass density
-        lims_dict (None or Dict): dictionary of [vmin, vmax] fixed limits on
+        sp : sphere data object to project within
+        center : List(float)
+            center (array of 3 values) in code units
+        width : Tuple[int, str]
+            width in code units or formatted with units, e.g. (1500, 'pc')
+        field : TODO
+        gas_title : str
+            title for overlay plot, 
+            i.e. r'H$\alpha$ Flux [$erg\: s^{-1}\: cm^{-2}$]'
+        gas_flag : bool
+            choose whether to plot gas overlay in addition to stellar
+            mass density
+        lims_dict : None or Dict
+            dictionary of [vmin, vmax] fixed limits on
             colorbar values for image if desired; otherwise None
+        ds: yt.Dataset
+            loaded RAMSES-RT data set. Optionally specify, otherwise
 
 
-        Returns:
+        Returns
         --------
         None
         '''
 
-        redshift = self.current_redshift
+        if ds is None:
+            ds = self.ds
+        if ad is None:
+            ad = self.ad
+
+        redshift = self.redshift
         lbox = width[0]
 
         #lims = lims_dict[field[1]]
@@ -1102,7 +1222,7 @@ class VisualizationManager:
                lims_dict=None,
                log=True,
                filename="panel"):
-        """
+        '''
         Generate a mixed multi-panel figure of projection and slice plots.
 
         Each panel can independently specify:
@@ -1119,7 +1239,8 @@ class VisualizationManager:
                 {
                   "field": ('gas','density'),
                   "plot_type": "projection" or "slice",
-                  "weight_field": optional tuple
+                  "weight_field": optional tuple,
+                  "title": str title
                 }
         width : tuple
             Plot width (value, unit).
@@ -1142,7 +1263,9 @@ class VisualizationManager:
         -------
         images : dict
             Dictionary mapping field name -> image array.
-        """
+        '''
+
+        # TODO add redshift to bottom left
 
         if ds is None:
             ds = self.ds
@@ -1159,9 +1282,9 @@ class VisualizationManager:
             plot_type = config.get("plot_type", "projection")
             weight_field = config.get("weight_field", None)
 
-            # ------------------------------------------
+            #------------------------------------------
             # Generate image depending on plot type
-            # ------------------------------------------
+            #------------------------------------------
 
             if plot_type.lower() == "projection":
 
@@ -1169,8 +1292,10 @@ class VisualizationManager:
                                          center=center,
                                          width=width,
                                          weight_field=weight_field,
-                                         data_source=sp)
+                                         data_source=sp,
+                                         buff_size=(self.buff_size, self.buff_size))
 
+                # TODO check this 
                 frb = proj.data_source.to_frb(width, self.buff_size)
                 image = np.array(frb[field]).astype(np.float32)
 
@@ -1178,7 +1303,8 @@ class VisualizationManager:
 
                 slc = yt.SlicePlot(ds, "z", field,
                                    center=center,
-                                   width=width)
+                                   width=width,
+                                   buff_size=(self.buff_size, self.buff_size))
 
                 frb = slc.data_source.to_frb(width, self.buff_size)
                 image = np.array(frb[field]).astype(np.float32)
@@ -1203,19 +1329,28 @@ class VisualizationManager:
                            norm=norm)
 
             cbar = fig.colorbar(im, ax=ax)
-            cbar.set_label(field[1])
+            #cbar.set_label(field[1])
+            cbar.set_label(config["title"])
 
-            ax.set_title(f"{field[1]} ({plot_type})")
+            # TODO change titles
+            #ax.set_title(f"{field[1]} ({plot_type})")
             ax.set_xlabel(f"X [{width[1]}]")
             ax.set_ylabel(f"Y [{width[1]}]")
 
             #------------------------------------------
             # Save FITS per panel
             #------------------------------------------
+            panel_path = os.path.join(self.directory, 'panel_plots')
+            fits_path = os.path.join(panel_path, 'panel_fits')
+
+            if not os.path.exists(panel_path):
+                os.makedirs(panel_path)
+            if not os.path.exists(fits_path):
+                os.makedirs(fits_path)
 
             self.write_fits_image(
                 image,
-                f"{self.output_dir}/{filename}_{field[1]}.fits",
+                f"{fits_path}/{filename}_{field[1]}.fits",
                 field=str(field),
                 width=width,
                 center=center,
@@ -1227,8 +1362,8 @@ class VisualizationManager:
             ax.axis("off")
 
         fig.tight_layout()
-        fig.savefig(f"{self.output_dir}/{filename}.pdf", dpi=300)
-        fig.savefig(f"{self.output_dir}/{filename}.png", dpi=300)
+        fig.savefig(f"{panel_path}/{filename}.pdf", dpi=300)
+        fig.savefig(f"{panel_path}/{filename}.png", dpi=300)
         plt.close(fig)
 
         return images
@@ -1441,3 +1576,4 @@ class VisualizationManager:
 
 # TODO linear profile plots
 # Lims Dict in Class
+# TODO 
