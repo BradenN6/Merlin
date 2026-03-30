@@ -43,8 +43,8 @@ print(star_ctr)
 
 # Save Simulation Information
 viz.save_sim_info()
-#viz.calc_luminosities(sp)
-#viz.save_sim_field_info(ds, ad, sp)
+viz.calc_luminosities(sp)
+viz.save_sim_field_info(ds, ad, sp)
 
 #-----------------------------
 # Projection/Slice Plots
@@ -122,13 +122,13 @@ for line in lines:
     weight_field_list.append(None)
 
 
-viz.plot_wrapper(sp, width, star_ctr, field_list,
-                     weight_field_list, title_list, proj=True, slc=False,
-                     lims_dict=lims_fiducial_00319)
+#viz.plot_wrapper(sp, width, star_ctr, field_list,
+#                     weight_field_list, title_list, proj=True, slc=False,
+#                     lims_dict=lims_fiducial_00319)
 
-viz.plot_wrapper(sp, width, star_ctr, field_list,
-                    weight_field_list, title_list, proj=True, slc=False,
-                    lims_dict=None)
+#viz.plot_wrapper(sp, width, star_ctr, field_list,
+#                    weight_field_list, title_list, proj=True, slc=False,
+#                    lims_dict=None)
 
 
 #-----------------------------
@@ -177,7 +177,7 @@ phase_config_list = [
      'x_label': 'Temperature [K]', 
      'y_label': r'Electron Number Density [cm$^{-3}$]', 
      'z_label': 'Mass [g]',
-     'linear': True
+     'linear': False
     },
     {'x_field': ('gas', 'my_temperature'),
      'y_field': ('gas', 'my_H_nuclei_density'),
@@ -298,3 +298,33 @@ viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 
 # TODO electorn density phase plots, test star-gas overlay, test panel
 # TODO ricotti plots
+
+# TODO update panel
+
+# TODO CC-Fiducial 2nd paper with F. Garcia
+# star formation efficiencies with C.C. He, Garcia
+# nuclear star cluster
+# Cloudy
+# spectrum from JWST observation -> motivate
+# faint, low-mass galaxy; scale luminosity with mass for comparison
+# high resolution
+# same lines? line ratios compatible?
+# total luminosity -> observed
+# Merlin
+# Science Cases
+# - line time dependence, fade after burst compared to tburst
+# - line diagnostics vs. ISM phase; inferred density vs distribution
+#   - phase plots
+#   - Ratio vs ne inflection point - good indicator
+#   - known distribution - high dens tail, gaussian; mass fraction vs. ne
+#   - inferred e- density, average <ne>
+# high den tail contribution high, ne^2
+# plot mass vs. ne
+# phase n vs. ne
+
+# TODO phase label
+# log scale histogram
+# high den tail power law 
+# broken power law 
+# slopes and cutoff at high den
+# break degeneracy with multiple diagnostics
