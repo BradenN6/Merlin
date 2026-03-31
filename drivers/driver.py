@@ -98,16 +98,6 @@ title_list = [
     r'Electron Number Density [cm$^{-3}$]',
 ]
 
-#field_list.append(('gas', 'flux_'  + 'H1_6562.80A'))
-#title_list.append(r'H$\alpha$_6562.80A'.replace('_', ' ') + 
-#                  r' Flux [erg s$^{-1}$ cm$^{-2}$]')
-#weight_field_list.append(None)
-
-#field_list.append(('gas', 'flux_'  + 'H1_4861.35A'))
-#title_list.append(r'H$\beta$_4861.35A'.replace('_', ' ') + 
-#                  r' Flux [erg s$^{-1}$ cm$^{-2}$]')
-#weight_field_list.append(None)
-
 for line in lines:
     if line == 'H1_6562.80A':
         line_title = r'H$\alpha$_6562.80A'
@@ -122,14 +112,13 @@ for line in lines:
     weight_field_list.append(None)
 
 
-#viz.plot_wrapper(sp, width, star_ctr, field_list,
-#                     weight_field_list, title_list, proj=True, slc=False,
-#                     lims_dict=lims_fiducial_00319)
+viz.plot_wrapper(sp, width, star_ctr, field_list,
+                     weight_field_list, title_list, proj=True, slc=False,
+                     lims_dict=lims_fiducial_00319)
 
-#viz.plot_wrapper(sp, width, star_ctr, field_list,
-#                    weight_field_list, title_list, proj=True, slc=False,
-#                    lims_dict=None)
-
+viz.plot_wrapper(sp, width, star_ctr, field_list,
+                    weight_field_list, title_list, proj=True, slc=False,
+                    lims_dict=None)
 
 #-----------------------------
 # Phase Plots
@@ -255,7 +244,7 @@ viz.phase_plot_wrapper(sp, phase_config_list)
 #                            (0,1000))
 
 
-
+# TODO all projected
 panel_config = [
     {'field': ('gas', 'density'),
      'plot_type': 'projection',
@@ -294,13 +283,9 @@ viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # units -> observed surface brightness
 # TODO additional line ratios - also phase plots
 # electron density phase plots
-
-
 # TODO electorn density phase plots, test star-gas overlay, test panel
 # TODO ricotti plots
-
 # TODO update panel
-
 # TODO CC-Fiducial 2nd paper with F. Garcia
 # star formation efficiencies with C.C. He, Garcia
 # nuclear star cluster
@@ -321,10 +306,10 @@ viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 # high den tail contribution high, ne^2
 # plot mass vs. ne
 # phase n vs. ne
-
 # TODO phase label
 # log scale histogram
 # high den tail power law 
 # broken power law 
 # slopes and cutoff at high den
 # break degeneracy with multiple diagnostics
+# linear profile plots

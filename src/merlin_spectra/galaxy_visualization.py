@@ -332,15 +332,15 @@ class VisualizationManager:
                         origin='lower', aspect='equal', 
                         interpolation='nearest', cmap='viridis')
 
-        plt.xlabel(f'X [{length_unit}]', fontsize=12)
-        plt.ylabel(f'Y [{length_unit}]', fontsize=12)
+        plt.xlabel(f'X [{length_unit}]', fontsize=16)
+        plt.ylabel(f'Y [{length_unit}]', fontsize=16)
         #plt.title(title, fontsize=14)
 
         plt.xlim(-lbox/2, lbox/2)
         plt.ylim(-lbox/2, lbox/2)
 
         cbar = plt.colorbar(im)
-        cbar.set_label(title, size=16)  # labelpad=10, y=1.05)
+        cbar.set_label(title, size=14)  # labelpad=10, y=1.05)
 
         # Add redshift
         plt.text(0.05, 0.05, f'z = {self.redshift:.5f}', color='white',
@@ -856,8 +856,8 @@ class VisualizationManager:
         cax = ax0.imshow(z_vals, origin="lower", aspect="auto",
                          extent=(min(x_vals), max(x_vals), min(y_vals),
                                  max(y_vals)))
-        ax0.set_xlabel(x_label)
-        ax0.set_ylabel(y_label)
+        ax0.set_xlabel(x_label, fontsize=16)
+        ax0.set_ylabel(y_label, fontsize=16)
         ax0.scatter(peak_x, peak_y, color="red",
                     label=f"Peak ({peak_x:.2f}, {peak_y:.2f}, {peak_z:.2f})")
         ax0.legend(loc="upper right")
@@ -919,7 +919,7 @@ class VisualizationManager:
         # Add colorbar on the right side of the profile plot
         cbar_ax = fig.add_axes([0.87, 0.15, 0.03, 0.7])
         cbar = fig.colorbar(cax, cax=cbar_ax, orientation='vertical')
-        cbar.set_label(z_label, size=15)
+        cbar.set_label(z_label, size=16)
 
         #z_total = sp.quantities.total_quantity(z_field).value
         #annotation_text = f'Total: {z_total:.4f}'
@@ -1146,8 +1146,8 @@ class VisualizationManager:
                    origin = 'lower', aspect = 'auto', cmap = 'winter_r')
         cbar = plt.colorbar(pad=0.04)
         cbar.set_label('Stellar Mass Density', size=16)
-        plt.xlabel("X (pc)")
-        plt.ylabel("Y (pc)")
+        plt.xlabel("X (pc)", fontsize=16)
+        plt.ylabel("Y (pc)", fontsize=16)
         #plt.title("Stellar Mass Density Distribution")
         plt.text(0.05, 0.05, f'z = {redshift:.5f}', color='black', fontsize=9,
                  ha='left', va='bottom', transform=plt.gca().transAxes)
@@ -1197,8 +1197,8 @@ class VisualizationManager:
                                  pad = 0.04)
             cbar2.set_label("Stellar Mass Density", size=16)
             # ax.scatter(pop2_xyz[:, 0], pop2_xyz[:, 1], s=5, marker='.', color='black')
-            ax.set_xlabel("X (pc)")
-            ax.set_ylabel("Y (pc)")
+            ax.set_xlabel("X (pc)", fontsize=16)
+            ax.set_ylabel("Y (pc)", fontsize=16)
             #ax.set_title(gas_title + ' and Stellar Mass Density Distribution')
             ax.set_xlim(-lbox / 2, lbox / 2)
             ax.set_ylim(-lbox / 2, lbox / 2)
@@ -1330,12 +1330,12 @@ class VisualizationManager:
 
             cbar = fig.colorbar(im, ax=ax)
             #cbar.set_label(field[1])
-            cbar.set_label(config["title"])
+            cbar.set_label(config["title"], size=14)
 
             # TODO change titles
             #ax.set_title(f"{field[1]} ({plot_type})")
-            ax.set_xlabel(f"X [{width[1]}]")
-            ax.set_ylabel(f"Y [{width[1]}]")
+            ax.set_xlabel(f"X [{width[1]}]", fontsize=16)
+            ax.set_ylabel(f"Y [{width[1]}]", fontsize=16)
 
             #------------------------------------------
             # Save FITS per panel
@@ -1478,13 +1478,13 @@ class VisualizationManager:
                 else:
                     ax1.set_ylim([10**flux_lims[0], 10**flux_lims[1]])
 
-            ax1.set_xlabel(r'Wavelength [$\AA$]')
+            ax1.set_xlabel(r'Wavelength [$\AA$]', fontsize=16)
             if not linear:
                 ax1.set_ylabel(
-                    r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]'
+                    r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]', fontsize=16
                 )
             else:
-                ax1.set_ylabel(r'Flux [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]')
+                ax1.set_ylabel(r'Flux [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]', fontsize=16)
 
             flux_fname = figname + '_flux'
             plt.savefig(flux_fname)
@@ -1510,10 +1510,10 @@ class VisualizationManager:
             ax1.set_xlabel(r'Wavelength [$\AA$]')
             if not linear:
                 ax1.set_ylabel(
-                    r'Log(Luminosity) [erg s$^{-1}$ $\AA^{-1}$]'
+                    r'Log(Luminosity) [erg s$^{-1}$ $\AA^{-1}$]', fontsize=16
                 )
             else:
-                ax1.set_ylabel(r'Luminosity [erg s$^{-1}$ $\AA^{-1}$]')
+                ax1.set_ylabel(r'Luminosity [erg s$^{-1}$ $\AA^{-1}$]', fontsize=16)
 
             lum_fname = figname + '_lum'
             plt.savefig(lum_fname)
@@ -1523,9 +1523,9 @@ class VisualizationManager:
             fig, (ax1, ax2) = plt.subplots(2, sharex=True)
             ax1.plot(wavelengths, np.log10(self.flux_arr), 'o')
             ax2.plot(wavelengths, np.log10(self.luminosities), 'o')
-            ax2.set_xlabel(r'Wavelength [$\AA$]')
-            ax1.set_ylabel(r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$]')
-            ax2.set_ylabel(r'Log(Luminosity) [erg s$^{-1}$]')
+            ax2.set_xlabel(r'Wavelength [$\AA$]', fontsize=16)
+            ax1.set_ylabel(r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$]', fontsize=16)
+            ax2.set_ylabel(r'Log(Luminosity) [erg s$^{-1}$]', fontsize=16)
             plt.savefig(figname)
             plt.close()
 
@@ -1574,6 +1574,5 @@ class VisualizationManager:
         return x_range, y_vals
     
 
-# TODO linear profile plots
 # Lims Dict in Class
-# TODO 
+# TODO consistent fontsize
