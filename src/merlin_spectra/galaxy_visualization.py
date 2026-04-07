@@ -108,6 +108,7 @@ class VisualizationManager:
         self.buff_size = buff_size
         self.lims_dict = lims_dict
         self.redshift = ds.current_redshift
+        self.hubble_constant = ds.hubble_constant
 
         # Analysis directory for saving
         self.directory = f'analysis/{self.output_file}_analysis'
@@ -406,6 +407,83 @@ class VisualizationManager:
         return luminosities
     
 
+    def code_age_to_myr(all_star_ages, hubble_const, unique_age=True, true_age=False):
+        r"""
+        Returns an array with unique birth epochs in Myr given
+        raw_birth_epochs = ad['star', 'particle_birth_epoch']
+        AND
+        hubble = ds.hubble_constant
+        Youngest is 0 Myr, all others are relative to the youngest.
+
+        Relative ages option is currently yielding inconsistent results
+        """
+        cgs_yr = 3.1556926e7  # 1yr (in s)
+        cgs_pc = 3.08567758e18  # pc (in cm)
+        h_0 = hubble_const * 100  # hubble parameter (km/s/Mpc)
+        h_0_invsec = h_0 * 1e5 / (1e6 * cgs_pc)  # hubble constant h [km/s Mpc-1]->[1/sec]
+        h_0inv_yr = 1 / h_0_invsec / cgs_yr  # 1/h_0 [yr]
+
+        if unique_age is True:
+            # process to unique birth epochs only as well as sort them
+            be_star_processed = np.array(sorted(list(set(all_star_ages.to_ndarray()))))
+            star_age_myr = (be_star_processed * h_0inv_yr) / 1e6  # t=0 is the present
+            relative_ages = star_age_myr - star_age_myr.min()
+        else:
+            all_stars = all_star_ages
+            star_age_myr = all_stars * h_0inv_yr / 1e6  # t=0 is the present
+            relative_ages = star_age_myr - star_age_myr.min()
+        if true_age is True:
+            return star_age_myr  # + 13.787 * 1e3
+        else:
+            return relative_ages  # t = 0 is the age of
+
+
+    def calc_sfr(self, dt, ds=None, ad=None):
+        '''
+        Calculate the star formation rate in a time slice.
+
+        Parameters
+        ----------
+        ds : yt.Dataset
+            loaded RAMSES-RT data set (optionally specify; otherwise use
+            object-stored ds)
+        dt : float
+            Time window (e.g., last 10 Myr - dt = 10.0)
+
+        Returns
+        -------
+        sfr : float
+        '''
+
+        if ds is None:
+            ds = self.ds
+        if ad is None:
+            ad = self.ad
+
+        # Get star particle masses and formation times
+        masses = self.ad[("star", "particle_mass")].to("Msun")
+        formation_epochs = self.ad[("star", "particle_birth_epoch")]
+
+        # TODO double check this stellar age conversion
+        converted = self.code_age_to_myr(
+            all_star_ages=formation_epochs,
+            hubble_const=self.hubble_constant,
+            unique_age=False,
+        )
+
+        # Current simulation time
+        t_now = ds.current_time.to("Myr")
+
+        # Select recently formed stars
+        #young = (t_now - formation_time) < dt
+        young = converted < dt
+
+        # Compute SFR
+        sfr = masses[young].sum() / (dt * 1e6)  # Msun/yr, all stars 10.0029Msun
+
+        return sfr
+
+
     def save_sim_info(self, ds=None):
         '''
         Save simulation parameters/information.
@@ -434,6 +512,9 @@ class VisualizationManager:
         self.omega_matter = ds.omega_matter
         self.omega_radiation = ds.omega_radiation
         self.hubble_constant = ds.hubble_constant
+        self.sfr_10 = self.calc_sfr(10.0)
+        self.sfr_5 = self.calc_sfr(5.0)
+        self.sfr_1 = self.calc_sfr(1.0)
 
         file_path = os.path.join(self.directory, 
                                 f'{self.output_file}_sim_info.txt')
@@ -450,6 +531,9 @@ class VisualizationManager:
             file.write(f'omega_matter: {self.omega_matter}\n')
             file.write(f'omega_radiation: {self.omega_radiation}\n')
             file.write(f'hubble_constant: {self.hubble_constant}\n')
+            file.write(f'sfr_10: {self.sfr_10}\n')
+            file.write(f'sfr_5: {self.sfr_5}\n')
+            file.write(f'sfr_1: {self.sfr_1}\n')
 
         # Copy information files from data folder to analysis
         # TODO logSFC
@@ -1392,7 +1476,7 @@ class VisualizationManager:
         cosmo = FlatLambdaCDM(H0=70, Om0=self.omega_matter)  # around 0.3
         
         # Mpc to cm
-        d_1 = cosmo.luminosity_distance(self.current_redshift)*3.086e24
+        d_1 = cosmo.luminosity_distance(self.redshift)*3.086e24
         #self.flux_arr = (self.luminosities / (4 * np.pi * d_1 ** 2)).value
         self.flux_arr = np.array(self.luminosities) / (4 * np.pi * d_1.value ** 2)
 
@@ -1454,7 +1538,7 @@ class VisualizationManager:
         # Display spectra at redshifted wavelengths
         # lambda_obs = (1+z)*lambda_rest
         if redshift_wavelengths:
-            wavelengths = (1 + self.current_redshift) * np.array(wavelengths)
+            wavelengths = (1 + self.redshift) * np.array(wavelengths)
             pad *= 5
 
         line_widths = np.array(wavelengths) / resolving_power  # Angstroms

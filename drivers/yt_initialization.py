@@ -148,7 +148,7 @@ def _my_He_number_density(field, data):
 
 
 def _OII_ratio(field, data):
-    # Local OII Ratio -- Diagnostic of TODO
+    # Local OII Ratio -- Diagnostic of electron number density
     # TODO lum or flux?
     #return data['gas', 'flux_O2_3728.80A']/data['gas', 'flux_O2_3726.10A']
     flux1 = data['gas', 'flux_O2_3728.80A']
@@ -157,6 +157,29 @@ def _OII_ratio(field, data):
     flux2 = np.where(flux2 < 1e-30, 1e-30, flux2)
 
     ratio = flux1 / flux2
+
+    return ratio
+
+def _SII_ratio(field, data):
+    # Local SII Ratio -- Diagnostic of electron number density
+    flux1 = data['gas', 'flux_S2_6716.44A']
+    flux2 = data['gas', 'flux_S2_6730.82A']
+
+    flux2 = np.where(flux2 < 1e-30, 1e-30, flux2)
+
+    ratio = flux1 / flux2
+
+    return ratio
+
+def _OIII_ratio(field, data):
+    # Local OIII Ratio -- Diagnostic of temperature
+    flux1 = data['gas', 'flux_O3_5006.84A']
+    flux2 = data['gas', 'flux_O3_4958.91A']
+    flux3 = data['gas', 'flux_O3_4363.21A']
+
+    flux3 = np.where(flux3 < 1e-30, 1e-30, flux3)
+
+    ratio = (flux1 + flux2) / flux2
 
     return ratio
 
@@ -374,7 +397,23 @@ ds.add_field(
     units="1",
     force_override=True
 )
-# TODO
+
+ds.add_field(
+    ("gas","SII_ratio"),
+    function=_SII_ratio,
+    sampling_type="cell",
+    units="1",
+    force_override=True
+)
+
+ds.add_field(
+    ("gas","OIII_ratio"),
+    function=_OIII_ratio,
+    sampling_type="cell",
+    units="1",
+    force_override=True
+)
+
 
 ad = ds.all_data()
 print(ds.field_list)
@@ -393,6 +432,8 @@ lims_fiducial_00319 = {
     ('gas', 'ion_param'):                   (4e-12, 1e-4),
     ('gas', 'metallicity'):                 (1e-5, 1e-3),
     ('gas', 'OII_ratio'):                   (1e-5, 1.5),
+    ('gas', 'SII_ratio'):                   (1e-5, 1.5), # TODO check these
+    ('gas', 'OIII_ratio'):                   (1e-5, 1.5),
     ('ramses', 'xHI'):                      (6e-1, 1e0),
     ('ramses', 'xHII'):                     (0.5e-2, 1e0),
     ('ramses', 'xHeII'):                    (1e-4, 1e-1),
@@ -426,3 +467,19 @@ lims_fiducial_00319 = {
     ('gas', 'flux_S2_6716.44A'):            (1e-12, 5e-7),
     ('gas', 'flux_S2_6730.82A'):            (1e-14, 1e-7),
 }
+
+
+#----------------
+# Line Ratio Diagnostics
+#----------------
+
+# Electron Number Density Diagnostics #
+# -- [O II] 3729/3726 --
+# -- [S II] 6717/6731 --
+
+# Temperature Diagnostics #
+# -- [O III] (5007 + 4959)/4363 --
+# -- [O I] (6300 + 6364)/5577 missing lines
+# -- [N II] (6548 + 6583)/5755 missing lines
+# -- [Ne III] (3869 + 3968)/3343 missing lines
+# -- [S III] (9531 + 9069)/6312 missing lines
