@@ -50,10 +50,13 @@ class VisualizationManager:
 
     def __init__(self, 
                  filename: str,
+                 ramses_dir,
+                 logSFC_path,
                  lines,
                  wavelengths,
                  ds,
                  ad,
+                 minimal_output=True,
                  buff_size: int=2000,
                  lims_dict=None):
         '''
@@ -63,6 +66,12 @@ class VisualizationManager:
         ----------
         filename : str
             Filepath to the RAMSES-RT output_*/info_*.txt file
+        ramses_dir : str
+            Filepath to the RAMSES-RT output directory
+            e.g. "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial"
+        logSFC_path : str
+            Filepath to the logSFC file
+            e.g. 
         lines : List, str 
             List of nebular emission lines
         wavelengths : List, float
@@ -98,6 +107,8 @@ class VisualizationManager:
         '''
 
         self.filename = filename
+        self.ramses_dir = ramses_dir
+        self.logSFC_path = logSFC_path
         self.file_dir = os.path.dirname(self.filename)
         self.lines = lines
         self.wavelengths = wavelengths
@@ -105,6 +116,7 @@ class VisualizationManager:
         self.sim_run = self.output_file.split('_')[1]
         self.ds = ds
         self.ad = ad
+        self.minimal_output = minimal_output
         self.buff_size = buff_size
         self.lims_dict = lims_dict
         self.redshift = ds.current_redshift
@@ -348,21 +360,25 @@ class VisualizationManager:
                  fontsize=9, ha='left', va='bottom',
                  transform=plt.gca().transAxes)
 
-        fits_fname = os.path.join(fits_path, plot_title)
+        if self.minimal_output is False:
+            fits_fname = os.path.join(fits_path, plot_title)
 
-        # Save FITS file
-        self.write_fits_image(
-            p_img,
-            f"{fits_fname}.fits",
-            field=str(field),
-            width=width,
-            center=self.star_center(),
-            redshift=self.redshift
-        )
+            # Save FITS file
+            self.write_fits_image(
+                p_img,
+                f"{fits_fname}.fits",
+                field=str(field),
+                width=width,
+                center=self.star_center(),
+                redshift=self.redshift
+            )
 
         # Save the figure
         plt.savefig(f"{fname}.png", dpi=300)
-        plt.savefig(f"{fname}.pdf", dpi=300)
+
+        if self.minimal_output is False:
+            plt.savefig(f"{fname}.pdf", dpi=300)
+        
         plt.close()
 
         return p_img
@@ -407,7 +423,7 @@ class VisualizationManager:
         return luminosities
     
 
-    def code_age_to_myr(all_star_ages, hubble_const, unique_age=True, true_age=False):
+    def code_age_to_myr(self, all_star_ages, hubble_const, unique_age=True, true_age=False):
         r"""
         Returns an array with unique birth epochs in Myr given
         raw_birth_epochs = ad['star', 'particle_birth_epoch']
@@ -416,6 +432,8 @@ class VisualizationManager:
         Youngest is 0 Myr, all others are relative to the youngest.
 
         Relative ages option is currently yielding inconsistent results
+
+        Adapted from F. A. Garcia
         """
         cgs_yr = 3.1556926e7  # 1yr (in s)
         cgs_pc = 3.08567758e18  # pc (in cm)
@@ -436,6 +454,37 @@ class VisualizationManager:
             return star_age_myr  # + 13.787 * 1e3
         else:
             return relative_ages  # t = 0 is the age of
+
+
+    def get_star_ages(self, ram_ds=None, ram_ad=None, logsfc=None):
+        """
+        star's ages in [Myr]
+
+        Adapted from F. A. Garcia
+        """
+
+        if ram_ds is None:
+            ram_ds = self.ds
+        if ram_ad is None:
+            ram_ad = self.ad
+        if logsfc is None:
+            logsfc = self.logSFC_path
+
+        first_form = np.loadtxt(logsfc, usecols=2).max()  # redshift z
+        current_hubble = ram_ds.hubble_constant
+        current_time = float(ram_ds.current_time.in_units("Myr"))
+
+        birth_start = np.round(
+            float(ram_ds.cosmology.t_from_z(first_form).in_units("Myr")), 0
+        )
+        converted_unfiltered = self.code_age_to_myr(
+            ram_ad["star", "particle_birth_epoch"],
+            current_hubble,
+            unique_age=False,
+        )
+        birthtime = np.round(converted_unfiltered + birth_start, 3)  #!
+        current_ages = np.array(np.round(current_time, 3) - np.round(birthtime, 3))
+        return current_ages
 
 
     def calc_sfr(self, dt, ds=None, ad=None):
@@ -462,21 +511,11 @@ class VisualizationManager:
 
         # Get star particle masses and formation times
         masses = self.ad[("star", "particle_mass")].to("Msun")
-        formation_epochs = self.ad[("star", "particle_birth_epoch")]
 
-        # TODO double check this stellar age conversion
-        converted = self.code_age_to_myr(
-            all_star_ages=formation_epochs,
-            hubble_const=self.hubble_constant,
-            unique_age=False,
-        )
-
-        # Current simulation time
-        t_now = ds.current_time.to("Myr")
+        current_ages = self.get_star_ages()
 
         # Select recently formed stars
-        #young = (t_now - formation_time) < dt
-        young = converted < dt
+        young = current_ages < dt
 
         # Compute SFR
         sfr = masses[young].sum() / (dt * 1e6)  # Msun/yr, all stars 10.0029Msun
@@ -1432,14 +1471,15 @@ class VisualizationManager:
             if not os.path.exists(fits_path):
                 os.makedirs(fits_path)
 
-            self.write_fits_image(
-                image,
-                f"{fits_path}/{filename}_{field[1]}.fits",
-                field=str(field),
-                width=width,
-                center=center,
-                redshift=ds.current_redshift
-            )
+            if self.minimal_output is False:
+                self.write_fits_image(
+                    image,
+                    f"{fits_path}/{filename}_{field[1]}.fits",
+                    field=str(field),
+                    width=width,
+                    center=center,
+                    redshift=ds.current_redshift
+                )
 
         # Turn off unused axes
         for ax in axes[len(panel_config):]:
@@ -1447,7 +1487,8 @@ class VisualizationManager:
 
         fig.tight_layout()
         fig.savefig(f"{panel_path}/{filename}.pdf", dpi=300)
-        fig.savefig(f"{panel_path}/{filename}.png", dpi=300)
+        if self.minimal_output is False:
+            fig.savefig(f"{panel_path}/{filename}.png", dpi=300)
         plt.close(fig)
 
         return images
@@ -1473,6 +1514,11 @@ class VisualizationManager:
             i.e. flux_lims=[-24, -19]
         '''
 
+        spectra_path = os.path.join(self.directory, 'spectra')
+        
+        if not os.path.exists(spectra_path):
+            os.makedirs(spectra_path)
+
         cosmo = FlatLambdaCDM(H0=70, Om0=self.omega_matter)  # around 0.3
         
         # Mpc to cm
@@ -1480,7 +1526,7 @@ class VisualizationManager:
         #self.flux_arr = (self.luminosities / (4 * np.pi * d_1 ** 2)).value
         self.flux_arr = np.array(self.luminosities) / (4 * np.pi * d_1.value ** 2)
 
-        fname = os.path.join(self.directory, self.output_file)
+        fname = os.path.join(spectra_path, self.output_file)
 
         # Raw spectra values
         self.plot_spectra(noise_lvl, resolving_power, 1000,
@@ -1562,16 +1608,24 @@ class VisualizationManager:
                 else:
                     ax1.set_ylim([10**flux_lims[0], 10**flux_lims[1]])
 
-            ax1.set_xlabel(r'Wavelength [$\AA$]', fontsize=16)
+            ax1.set_xlabel(r'Wavelength [$\AA$]', fontsize=12)
             if not linear:
                 ax1.set_ylabel(
-                    r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]', fontsize=16
+                    r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]', fontsize=12
                 )
             else:
-                ax1.set_ylabel(r'Flux [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]', fontsize=16)
+                ax1.set_ylabel(r'Flux [erg s$^{-1}$ cm$^{-2}$ $\AA^{-1}$]', fontsize=12)
+
+            # Add redshift
+            plt.text(0.95, 0.95, f'z = {self.redshift:.5f}', color='black',
+                     fontsize=9, ha='right', va='top',
+                     transform=plt.gca().transAxes)
 
             flux_fname = figname + '_flux'
-            plt.savefig(flux_fname)
+            if self.minimal_output is False:
+                plt.savefig(f"{flux_fname}.pdf", dpi=300)
+            plt.savefig(f"{flux_fname}.png", dpi=300)
+            #plt.savefig(flux_fname)
             plt.close()
 
             fig, ax1 = plt.subplots(1)
@@ -1591,26 +1645,32 @@ class VisualizationManager:
                 else:
                     ax1.set_ylim([10**lum_lims[0], 10**lum_lims[1]])
 
-            ax1.set_xlabel(r'Wavelength [$\AA$]')
+            ax1.set_xlabel(r'Wavelength [$\AA$]', fontsize=12)
             if not linear:
                 ax1.set_ylabel(
-                    r'Log(Luminosity) [erg s$^{-1}$ $\AA^{-1}$]', fontsize=16
+                    r'Log(Luminosity) [erg s$^{-1}$ $\AA^{-1}$]', fontsize=12
                 )
             else:
-                ax1.set_ylabel(r'Luminosity [erg s$^{-1}$ $\AA^{-1}$]', fontsize=16)
+                ax1.set_ylabel(r'Luminosity [erg s$^{-1}$ $\AA^{-1}$]', fontsize=12)
 
             lum_fname = figname + '_lum'
-            plt.savefig(lum_fname)
+            if self.minimal_output is False:
+                plt.savefig(f"{lum_fname}.pdf", dpi=300)
+            plt.savefig(f"{lum_fname}.png", dpi=300)
+            #plt.savefig(lum_fname)
             plt.close()
 
         else:
             fig, (ax1, ax2) = plt.subplots(2, sharex=True)
             ax1.plot(wavelengths, np.log10(self.flux_arr), 'o')
             ax2.plot(wavelengths, np.log10(self.luminosities), 'o')
-            ax2.set_xlabel(r'Wavelength [$\AA$]', fontsize=16)
-            ax1.set_ylabel(r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$]', fontsize=16)
-            ax2.set_ylabel(r'Log(Luminosity) [erg s$^{-1}$]', fontsize=16)
-            plt.savefig(figname)
+            ax2.set_xlabel(r'Wavelength [$\AA$]', fontsize=12)
+            ax1.set_ylabel(r'Log(Flux) [erg s$^{-1}$ cm$^{-2}$]', fontsize=12)
+            ax2.set_ylabel(r'Log(Luminosity) [erg s$^{-1}$]', fontsize=12)
+            if self.minimal_output is False:
+                plt.savefig(f"{figname}.pdf", dpi=300)
+            plt.savefig(f"{figname}.png", dpi=300)
+            #plt.savefig(figname)
             plt.close()
 
 
@@ -1660,3 +1720,5 @@ class VisualizationManager:
 
 # Lims Dict in Class
 # TODO consistent fontsize
+
+# TODO change panel plot frb approach

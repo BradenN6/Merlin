@@ -42,7 +42,10 @@ for analysis.
 # Initialisation
 #----------------
 
-filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
+#filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
+filename = "/Users/bnowicki/Research/Ricotti/output_00389/info_00389.txt"
+ramses_dir = "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial"
+logSFC_path = "/Users/bnowicki/Research/Ricotti/output_00273/logSFC"
 #filename = sys.argv[1]
 print(f'RAMSES-RT Data Filepath = {filename}')
 

@@ -26,6 +26,8 @@ Driver script
 #------------------------------------------------------------------------------
 
 filename = yt_initialization.filename
+ramses_dir = yt_initialization.ramses_dir
+logSFC_path = yt_initialization.logSFC_path
 lines = yt_initialization.lines
 wavelengths = yt_initialization.wavelengths
 ds = yt_initialization.ds
@@ -34,7 +36,7 @@ lims_fiducial_00319 = yt_initialization.lims_fiducial_00319
 emission_interpolator = yt_initialization.emission_interpolator
 
 # Create a visualization object
-viz = merlin.VisualizationManager(filename, lines, wavelengths, ds, ad, lims_dict=lims_fiducial_00319)
+viz = merlin.VisualizationManager(filename, ramses_dir, logSFC_path, lines, wavelengths, ds, ad, lims_dict=lims_fiducial_00319)
 
 # Star centre of mass; sphere objects; window width
 star_ctr = viz.star_center(ad)
@@ -96,9 +98,9 @@ title_list = [
     'Temperature [K]',
     'Ionization Parameter',
     'Metallicity',
-    r'[O II] Ratio $\lambda$ 3728.80\AA/$\lambda$ 3726.10\AA',
-    r'[S II] Ratio $\lambda$ 6716.44\AA/$\lambda$ 6730.82\AA',
-    r'[O III] Ratio ($\lambda$ 5006.84\AA + $\lambda$ 4958.91\AA)/$\lambda$ 4363.21\AA',
+    r'[O II] Ratio $\lambda$ 3728.80A/$\lambda$ 3726.10A',
+    r'[S II] Ratio $\lambda$ 6716.44A/$\lambda$ 6730.82A',
+    r'[O III] Ratio',
     r'X$_{\text{HI}}$',
     r'X$_{\text{HII}}$',
     r'X$_{\text{HeII}}$',
@@ -106,6 +108,8 @@ title_list = [
     r'He Number Density [cm$^{-3}$]',
     r'Electron Number Density [cm$^{-3}$]',
 ]
+
+#r'[O III] Ratio ($\lambda$ 5006.84A + $\lambda$ 4958.91A)/$\lambda$ 4363.21A',
 
 for line in lines:
     if line == 'H1_6562.80A':
@@ -121,13 +125,13 @@ for line in lines:
     weight_field_list.append(None)
 
 
-#viz.plot_wrapper(sp, width, star_ctr, field_list,
-#                     weight_field_list, title_list, proj=True, slc=False,
-#                     lims_dict=lims_fiducial_00319)
+viz.plot_wrapper(sp, width, star_ctr, field_list,
+                     weight_field_list, title_list, proj=True, slc=False,
+                     lims_dict=lims_fiducial_00319)
 
-#viz.plot_wrapper(sp, width, star_ctr, field_list,
-#                    weight_field_list, title_list, proj=True, slc=False,
-#                    lims_dict=None)
+viz.plot_wrapper(sp, width, star_ctr, field_list,
+                    weight_field_list, title_list, proj=True, slc=False,
+                    lims_dict=None)
 
 #-----------------------------
 # Phase Plots
@@ -208,14 +212,14 @@ phase_config_list = [
     },
 ]
 
-#viz.phase_plot_wrapper(sp, phase_config_list)
+viz.phase_plot_wrapper(sp, phase_config_list)
 
 #-----------------------------
 # Spectra Generation
 #-----------------------------
 
 # TODO self.current_redshift
-viz.spectra_driver(ds, 1000, 1e-25)
+viz.spectra_driver(1000, 1e-25)
 # TODO lum_lims
 
 #line_title = r'H$\alpha$_6562.80A'
@@ -225,11 +229,11 @@ viz.spectra_driver(ds, 1000, 1e-25)
 #-----------------------------
 
 # Cumulative Flux Plot
-#viz.plot_cumulative_field(sp, [('gas', 'flux_H1_6562.80A')],
-#                          r'H$\alpha$_6562.80A'.replace('_', ' ') + 
-#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]',
-#                            'flux_H1_6562.80A_cumulative',
-#                            (0,1000))
+viz.plot_cumulative_field(sp, [('gas', 'flux_H1_6562.80A')],
+                          r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]',
+                            'flux_H1_6562.80A_cumulative',
+                            (0,1000))
 
 
 # TODO all 'Projected'
@@ -283,11 +287,11 @@ panel_config_eden_line_ratios = [
     {'field': ('gas', 'OII_ratio'),
      'plot_type': 'projection',
      'weight_field': ('gas', 'my_H_nuclei_density'),
-     'title': r'[O II] Ratio $\lambda$ 3728.80\AA/$\lambda$ 3726.10\AA'},
+     'title': r'[O II] Ratio $\lambda$ 3728.80A/$\lambda$ 3726.10A'},
      {'field': ('gas', 'SII_ratio'),
      'plot_type': 'projection',
      'weight_field': ('gas', 'my_H_nuclei_density'),
-     'title': r'[S II] Ratio $\lambda$ 6716.44\AA/$\lambda$ 6730.82\AA'},
+     'title': r'[S II] Ratio $\lambda$ 6716.44A/$\lambda$ 6730.82A'},
      {'field': ('gas', 'electron_number_density'),
      'plot_type': 'projection',
      'weight_field': ('gas', 'my_H_nuclei_density'),
@@ -302,7 +306,7 @@ panel_config_temp_line_ratios = [
     {'field': ('gas', 'OIII_ratio'),
      'plot_type': 'projection',
      'weight_field': ('gas', 'my_H_nuclei_density'),
-     'title': r'[O III] Ratio ($\lambda$ 5006.84\AA + $\lambda$ 4958.91\AA)/$\lambda$ 4363.21\AA'},
+     'title': r'[O III] Ratio'},
      {'field': ('gas', 'electron_number_density'),
      'plot_type': 'projection',
      'weight_field': ('gas', 'my_H_nuclei_density'),
@@ -313,6 +317,59 @@ panel_config_temp_line_ratios = [
      'title': 'Temperature [K]'},
 ]
 
+panel_config_line_emission_4 = [
+    {'field': ('gas', 'flux_H1_6562.80A'),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+     {'field': ('gas', 'flux_H1_4861.35A'),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': r'H$\beta$_4861.35A'.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+    {'field': ('gas', 'flux_O2_3726.10A'),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': 'O2_3726.10A'.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+    {'field': ('gas', 'flux_O3_5006.84A'),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': 'O3_5006.84A'.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+]
+
+lines = ["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+       "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
+       "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
+       "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
+       "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
+
+panel_config_line_emission_all = [
+    {'field': ('gas', 'flux_H1_6562.80A'),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+     {'field': ('gas', 'flux_H1_4861.35A'),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': r'H$\beta$_4861.35A'.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+]
+
+# not quite all, skipping O1 1304
+for line in lines[3::]:
+    config_element = {'field': ('gas', 'flux_' + line),
+     'plot_type': 'projection',
+     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'title': line.replace('_', ' ') + 
+                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'}
+    panel_config_line_emission_all.append(config_element)
+
+
+
 # TODO panels of line emission
 # TODO plots over time, connect with SFR bursts, star particle mass
 
@@ -321,6 +378,15 @@ viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filenam
 viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs')
 viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios')
 viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios')
+viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4')
+viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all')
+
+viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all_lims', lims_dict=lims_fiducial_00319)
 
 
 # Stellar Density
@@ -407,3 +473,4 @@ viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
 #print(birth_time.to('Myr'))
 
 # TODO additional line ratios
+# TODO angstrom label

@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "merlin-spectra"
-version = "0.0.21"
+version = "0.0.28"
 authors = [
   { name="Braden Marazzo-Nowicki", email="bnowicki@terpmail.umd.edu" },
 ]
