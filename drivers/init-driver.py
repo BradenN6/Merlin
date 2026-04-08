@@ -48,6 +48,7 @@ for analysis.
 filename = sys.argv[1]
 ramses_dir = "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial"
 logSFC_path = "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial/logSFC"
+output_dir = "/scratch/zt1/project/ricotti-prj/user/bnowicki"
 #filename = sys.argv[1]
 print(f'RAMSES-RT Data Filepath = {filename}')
 
@@ -529,7 +530,7 @@ Driver script
 #emission_interpolator = yt_initialization.emission_interpolator
 
 # Create a visualization object
-viz = merlin.VisualizationManager(filename, ramses_dir, logSFC_path, lines, wavelengths, ds, ad, minimal_output=True, lims_dict=lims_fiducial_00319)
+viz = merlin.VisualizationManager(filename, ramses_dir, logSFC_path, lines, wavelengths, ds, ad, output_dir=output_dir, minimal_output=True, lims_dict=lims_fiducial_00319)
 
 # Star centre of mass; sphere objects; window width
 star_ctr = viz.star_center(ad)
@@ -622,9 +623,9 @@ viz.plot_wrapper(sp, width, star_ctr, field_list,
                      weight_field_list, title_list, proj=True, slc=False,
                      lims_dict=lims_fiducial_00319)
 
-viz.plot_wrapper(sp, width, star_ctr, field_list,
-                    weight_field_list, title_list, proj=True, slc=False,
-                    lims_dict=None)
+#viz.plot_wrapper(sp, width, star_ctr, field_list,
+#                    weight_field_list, title_list, proj=True, slc=False,
+#                    lims_dict=None)
 
 #-----------------------------
 # Phase Plots
@@ -867,19 +868,19 @@ for line in lines[3::]:
 # TODO plots over time, connect with SFR bursts, star particle mass
 
 # TODO lims
-viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi')
-viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs')
-viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios')
-viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios')
-viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4')
-viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all')
+#viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi')
+#viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs')
+#viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios')
+#viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios')
+#viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4')
+#viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all')
 
 viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi_lims', lims_dict=lims_fiducial_00319)
-viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs_lims', lims_dict=lims_fiducial_00319)
-viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios_lims', lims_dict=lims_fiducial_00319)
-viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios_lims', lims_dict=lims_fiducial_00319)
-viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_lims', lims_dict=lims_fiducial_00319)
-viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all_lims', lims_dict=lims_fiducial_00319)
 
 
 # Stellar Density

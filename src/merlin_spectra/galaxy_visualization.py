@@ -56,6 +56,7 @@ class VisualizationManager:
                  wavelengths,
                  ds,
                  ad,
+                 output_dir,
                  minimal_output=True,
                  buff_size: int=2000,
                  lims_dict=None):
@@ -116,6 +117,7 @@ class VisualizationManager:
         self.sim_run = self.output_file.split('_')[1]
         self.ds = ds
         self.ad = ad
+        self.output_dir = output_dir
         self.minimal_output = minimal_output
         self.buff_size = buff_size
         self.lims_dict = lims_dict
@@ -123,7 +125,7 @@ class VisualizationManager:
         self.hubble_constant = ds.hubble_constant
 
         # Analysis directory for saving
-        self.directory = f'analysis/{self.output_file}_analysis'
+        self.directory = f'{output_dir}/analysis/{self.output_file}_analysis'
 
         if not os.path.exists(self.directory):
             os.makedirs(self.directory)
