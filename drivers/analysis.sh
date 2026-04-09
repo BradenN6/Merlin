@@ -1,13 +1,13 @@
-#!/bin/bash --login 
-#SBATCH --account=ricotti-prj-astr                                                                                                                                                                                 
-#SBATCH --job-name=nebular-lines                                                                                                                                                             
-#SBATCH --output=logs/job_%A_%a.out                                                                                                                                                              
-#SBATCH --error=logs/job_%A_%a.err                                                                                                                                                              
-#SBATCH --array=0-162                                                                                                                                                                                                                                                                                                                                                               
-#SBATCH --ntasks=1                                                                                                                                                                              
+#!/bin/bash --login
+#SBATCH --account=ricotti-prj-astr
+#SBATCH --job-name=nebular-lines
+#SBATCH --output=/scratch/zt1/project/ricotti-prj/user/bnowicki/logs/stdout-%A_%a.txt
+#SBATCH --error=/scratch/zt1/project/ricotti-prj/user/bnowicki/logs/stderr-%A_%a.txt
+#SBATCH --array=0-162
+#SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
-#SBATCH --mem-per-cpu=3G                                                                                                                                                                                                                                                                                                                                            
-#SBATCH --time=00-02:00:00 
+#SBATCH --mem-per-cpu=3G
+#SBATCH --time=00-02:00:00
 
 # Specify the directory containing the files
 directory="/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial" 
@@ -37,7 +37,9 @@ echo "SLURM Job ID: $SLURM_ARRAY_JOB_ID"
 echo "SLURM Task ID: $SLURM_ARRAY_TASK_ID"
 echo "Using input file: $input_file"
 
-echo "which python: $(which python)"
+echo "which python: $python_path"
+echo "Python version: $($python_path --version)"
+#echo "which python: $(which python)"
 echo "Python Path: $python_path"
 echo "Using input file: $input_file"
 echo "Scan: $padded_scan_num"

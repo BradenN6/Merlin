@@ -45,11 +45,14 @@ for analysis.
 #----------------
 
 #filename = "/Users/bnowicki/Research/Ricotti/output_00273/info_00273.txt"
+#filename = "/Users/bnowicki/Research/Ricotti/output_00389/info_00389.txt"
+#logSFC_path = "/Users/bnowicki/Research/Ricotti/output_00273/logSFC"
+#output_dir = "/Users/bnowicki/Research/Github/Merlin/drivers"
+
 filename = sys.argv[1]
 ramses_dir = "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial"
 logSFC_path = "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial/logSFC"
 output_dir = "/scratch/zt1/project/ricotti-prj/user/bnowicki"
-#filename = sys.argv[1]
 print(f'RAMSES-RT Data Filepath = {filename}')
 
 # List of lines in Cloudy Table
@@ -623,9 +626,9 @@ viz.plot_wrapper(sp, width, star_ctr, field_list,
                      weight_field_list, title_list, proj=True, slc=False,
                      lims_dict=lims_fiducial_00319)
 
-#viz.plot_wrapper(sp, width, star_ctr, field_list,
-#                    weight_field_list, title_list, proj=True, slc=False,
-#                    lims_dict=None)
+viz.plot_wrapper(sp, width, star_ctr, field_list,
+                    weight_field_list, title_list, proj=True, slc=False,
+                    lims_dict=None)
 
 #-----------------------------
 # Phase Plots
