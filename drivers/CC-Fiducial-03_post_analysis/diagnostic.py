@@ -107,7 +107,8 @@ plot_path
 
 # Extract additional physical parameters
 temperature = df["('gas', 'temperature')_mean"]
-density = df["('gas', 'density')_mean"]
+#density = df["('gas', 'density')_mean"]
+edensity = df["('gas', 'electron_number_density')_mean"]
 
 # Create an overlaid plot with a secondary y-axis
 fig, ax1 = plt.subplots(figsize=(12, 6))
@@ -122,9 +123,10 @@ ax1.tick_params(axis='y', labelcolor='b')
 ax2 = ax1.twinx()
 
 # Plot density and temperature on the secondary y-axis
-ax2.plot(df.current_redshift, density/1.6e-24, 'g--', label='Density (mean)')
+#ax2.plot(df.current_redshift, density/1.6e-24, 'g--', label='Density (mean)')
+ax2.plot(df.current_redshift, edensity, 'g--', label='Density (mean)')
 ax2.plot(df.current_redshift, temperature, 'r-.', label='Temperature (mean)')
-ax2.set_ylabel("Density / Temperature", color='k')
+ax2.set_ylabel(r"Electro Number Density [cm$^{-3}$], Temperature [K]", color='k')
 ax2.tick_params(axis='y', labelcolor='k')
 ax2.set_yscale('log')
 
@@ -138,6 +140,7 @@ lines, labels = ax1.get_legend_handles_labels()
 lines2, labels2 = ax2.get_legend_handles_labels()
 ax2.legend(lines + lines2, labels + labels2, loc='upper right')
 plt.gca().invert_xaxis()
+plt.grid(True)
 
 # Save the combined plot
 overlay_plot_path = "o3_density_temp_overlay.png"
@@ -205,8 +208,8 @@ plt.plot(ne_s2(xx),xx, label='fit s2')
 
 plt.xscale('log')
 plt.xlabel('Electron Density $n_e$ (cm$^{-3}$)')
-plt.ylabel('[O II] 3729 / 3726')
-plt.title('[O II] Line Ratio vs Electron Density\n(Te = 10,000 K)')
+plt.ylabel('Line Ratio')
+plt.title('Density Diagnostic Line Ratios vs Electron Density\n(Te = 10,000 K)')
 plt.grid(True)
 plt.axhline(1.5, color='gray', linestyle='--', label='Low-density limit')
 plt.axhline(0.35, color='gray', linestyle=':', label='High-density limit')
@@ -277,7 +280,7 @@ sfri  = sfri[sfr_mask]
 plt.plot(z_sfr, 5e3*sfri, color='green', label='sfr')
 
 plt.xlabel("Redshift")
-plt.ylabel("Electron Density")
+plt.ylabel(r"Electron Number Density [cm$^{-3}$]")
 plt.title("Line Ratio as Density Diagnostic")
 plt.grid(True)
 plt.yscale('log')

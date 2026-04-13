@@ -101,7 +101,8 @@ plot_path
 
 # Extract additional physical parameters
 temperature = df["('gas', 'temperature')_mean"]
-density = df["('gas', 'density')_mean"]
+#density = df["('gas', 'density')_mean"]
+edensity = df["('gas', 'electron_number_density')_mean"]
 
 # Create an overlaid plot with a secondary y-axis
 fig, ax1 = plt.subplots(figsize=(12, 6))
@@ -116,9 +117,10 @@ ax1.tick_params(axis='y', labelcolor='b')
 ax2 = ax1.twinx()
 
 # Plot density and temperature on the secondary y-axis
-ax2.plot(df.index, density/1.6e-24, 'g--', label='Density (mean)')
+#ax2.plot(df.index, density/1.6e-24, 'g--', label='Density (mean)')
+ax2.plot(df.index, edensity, 'g--', label='Density (mean)')
 ax2.plot(df.index, temperature, 'r-.', label='Temperature (mean)')
-ax2.set_ylabel("Density / Temperature", color='k')
+ax2.set_ylabel(r"Electron Number Density [cm$^{-3}$] / Temperature [K]", color='k')
 ax2.tick_params(axis='y', labelcolor='k')
 ax2.set_yscale('log')
 

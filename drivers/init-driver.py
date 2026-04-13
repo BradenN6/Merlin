@@ -741,6 +741,17 @@ phase_config_list = [
      'z_label': r'[O III] Ratio',
      'linear': False
     },
+    {'x_field': ('gas', 'my_temperature'),
+     'y_field': ('gas', 'electron_number_density'),
+     'z_field': ('gas', 'flux_O3_5006.84A'),
+     'extrema': {('gas', 'my_temperature'): (1e3, 1e8),
+                 ('gas', 'electron_number_density'): (0.5e-2, 1e5),
+                 ('gas', 'flux_H1_6562.80A'): (1e-20, 1e-14)},
+     'x_label': 'Log(Temperature) [K]', 
+     'y_label': r'Log(Electron Number Density) [cm$^{-3}$]', 
+     'z_label': r'Log([O III] 5006.84A Flux [erg s$^{-1}$ cm$^{-2}$]',
+     'linear': False
+    },
 ]
 
 
@@ -761,11 +772,11 @@ viz.phase_plot_wrapper(sp, phase_config_list)
 #-----------------------------
 
 # Cumulative Flux Plot
-viz.plot_cumulative_field(sp, [('gas', 'flux_H1_6562.80A')],
-                          r'H$\alpha$_6562.80A'.replace('_', ' ') + 
-                            r' Flux [erg s$^{-1}$ cm$^{-2}$]',
-                            'flux_H1_6562.80A_cumulative',
-                            (0,1000))
+#viz.plot_cumulative_field(sp, [('gas', 'flux_H1_6562.80A')],
+#                          r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]',
+#                            'flux_H1_6562.80A_cumulative',
+#                            (0,1000))
 
 
 # TODO all 'Projected'
@@ -933,22 +944,22 @@ panel_config_line_emission_4 = [
 panel_config_line_emission_4_alt = [
      {'field': ('gas', 'flux_H1_4861.35A'),
      'plot_type': 'projection',
-     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'weight_field': None,
      'title': r'H$\beta$_4861.35A'.replace('_', ' ') + 
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
     {'field': ('gas', 'flux_O2_3726.10A'),
      'plot_type': 'projection',
-     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'weight_field': None,
      'title': 'O2_3726.10A'.replace('_', ' ') + 
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
     {'field': ('gas', 'flux_O3_5006.84A'),
      'plot_type': 'projection',
-     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'weight_field': None,
      'title': 'O3_5006.84A'.replace('_', ' ') + 
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
     {'field': ('gas', 'flux_Mg2_2795.53A'),
      'plot_type': 'projection',
-     'weight_field': ('gas', 'my_H_nuclei_density'),
+     'weight_field': None,
      'title': 'Mg2_2795.53A'.replace('_', ' ') + 
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
 ]
@@ -994,11 +1005,11 @@ for line in lines[3::]:
 #viz.panel_plot(sp, panel_config_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_line_ratios')
 #viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios')
 #viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4')
-#viz.panel_plot(sp, panel_config_line_emission_4_alt, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_alt')
+viz.panel_plot(sp, panel_config_line_emission_4_alt, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_alt')
 #viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all')
 
-viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi_lims', lims_dict=lims_fiducial_00319)
-viz.panel_plot(sp, panel_config_envi_2, width, star_ctr, nrows=2, ncols=5, filename='panel_envi_2_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi_lims', lims_dict=lims_fiducial_00319)
+#viz.panel_plot(sp, panel_config_envi_2, width, star_ctr, nrows=2, ncols=5, filename='panel_envi_2_lims', lims_dict=lims_fiducial_00319)
 #viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs_lims', lims_dict=lims_fiducial_00319)
 #viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios_lims', lims_dict=lims_fiducial_00319)
 #viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios_lims', lims_dict=lims_fiducial_00319)
@@ -1009,10 +1020,10 @@ viz.panel_plot(sp, panel_config_envi_2, width, star_ctr, nrows=2, ncols=5, filen
 
 
 # Stellar Density
-viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
-                    r'H$\alpha$_6562.80A'.replace('_', ' ') + 
-                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=True,
-                            lims_dict=lims_fiducial_00319)
+#viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
+#                    r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=True,
+#                            lims_dict=lims_fiducial_00319)
 
 
 
