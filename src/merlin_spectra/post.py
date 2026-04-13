@@ -234,7 +234,7 @@ class SimulationPostAnalysis:
                        borderaxespad=0.)
 
         plt.xlabel('Redshift')
-        plt.ylabel(r'Luminosity [erg s$^{-1}$]')
+        plt.ylabel(r'Log(Luminosity) [erg s$^{-1}$]')
         plt.grid(True)
         ax = plt.gca()
         ax.invert_xaxis()

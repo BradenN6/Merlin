@@ -25,14 +25,16 @@ lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
        "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
 # Create Simulation_Post_Analysis object and populate a csv
-simpost = merlin_spectra.SimulationPostAnalysis('CC-Fiducial-02', path, lines)
+simpost = merlin_spectra.SimulationPostAnalysis('CC-Fiducial-03', path, lines)
 
 df = simpost.populate_table()
 
 print(df.shape)
-print(df.columns)
+#print(df.columns)
 
-df_path = os.path.join(os.getcwd(), "CC-Fiducial_post_analysis/analysis_data.csv")
+print(df.columns.tolist())
+
+df_path = os.path.join(os.getcwd(), "CC-Fiducial-03_post_analysis/analysis_data.csv")
 df = pd.read_csv(df_path)
 
 lines_plot = lines
@@ -52,8 +54,10 @@ for i, column in enumerate(column_list):
              print(column)
     
 
+
 simpost.lvz(df, lines_plot, group_species=True)
 simpost.lvz(df, lines_plot, group_species=False)
+# TODO change to Log(Luminosity) label
 
 # TODO plot with star particle aggregate mass
 # TODO massimo code

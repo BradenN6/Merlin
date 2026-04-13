@@ -230,6 +230,7 @@ ax.plot(temp_vals, ratio_stacked, color='black', lw=2, linestyle='--', label='st
 
 # --- Axes formatting ---
 ax.set_xscale('log')
+#ax.set_yscale('log')
 ax.set_xlabel(r'$\log_{10}(T_e)$ [K]', fontsize=13)
 ax.set_ylabel(r'[O III] $(\lambda5007 + \lambda 4959)/\lambda4363$', fontsize=13)
 ax.set_xlim(10**3.5, 10**4.5)

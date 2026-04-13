@@ -614,13 +614,16 @@ class VisualizationManager:
             ('gas', 'ion_param'),
             ('gas', 'metallicity'),
             ('gas', 'OII_ratio'),
+            ('gas', 'SII_ratio'),
+            ('gas', 'OIII_ratio'),
             ('ramses', 'xHI'),
             ('ramses', 'xHII'),
             ('ramses', 'xHeII'),
             ('ramses', 'xHeIII'),
             ('star', 'particle_mass'),
             ('gas','my_He_number_density'),
-            ('gas', 'electron_number_density')
+            ('gas', 'electron_number_density'),
+            ('star', 'particle_mass')
         ]
 
         for line in self.lines:
@@ -647,7 +650,25 @@ class VisualizationManager:
                                 f'{self.output_file}_field_info.txt')
         
         stellar_mass = \
-            ad.quantities.total_quantity(('star', 'particle_mass')).value
+            ad.quantities.total_quantity(('star', 'particle_mass')).to("Msun") #.value
+        
+        gas_mass = ad.quantities.total_quantity(('gas', 'cell_mass')).to('Msun')
+        cell_mass = ad[('gas', 'cell_mass')].to('Msun')
+
+        xHII   = ad[('ramses', 'xHII')]
+        xHeII  = ad[('ramses', 'xHeII')]
+        xHeIII = ad[('ramses', 'xHeIII')]
+
+        # Standard primordial mass fractions
+        X = 0.76  # hydrogen
+        Y = 0.24  # helium
+
+        # Ionised hydrogen + singly and doubly ionised helium
+        ionised_mass = (
+            X * xHII * cell_mass
+            + Y * xHeII * cell_mass
+            + Y * xHeIII * cell_mass
+        ).sum()
         
         with open(file_path, 'w') as file:
             for i, field in enumerate(fields):
@@ -656,7 +677,9 @@ class VisualizationManager:
                 file.write(f'{field}_mean: {field_info[i][2]}\n')
                 file.write(f'{field}_agg: {field_info[i][3]}\n')
 
-            file.write(f'Stellar Mass: {stellar_mass}' )
+            file.write(f'Stellar_Mass_Msun: {stellar_mass.value}\n')
+            file.write(f'Gas_Mass_Msun: {gas_mass.value}\n')
+            file.write(f'Ionised_Gas_Mass_Msun: {ionised_mass.value}\n')
 
         '''
         Reading the data file example:
@@ -1395,6 +1418,9 @@ class VisualizationManager:
         if ds is None:
             ds = self.ds
 
+        lbox = width[0]
+        length_unit = width[1]
+
         fig, axes = plt.subplots(nrows, ncols,
                                  figsize=(6*ncols, 5*nrows))
 
@@ -1421,8 +1447,11 @@ class VisualizationManager:
                                          buff_size=(self.buff_size, self.buff_size))
 
                 # TODO check this 
-                frb = proj.data_source.to_frb(width, self.buff_size)
-                image = np.array(frb[field]).astype(np.float32)
+                #frb = proj.data_source.to_frb(width, self.buff_size)
+                #image = np.array(frb[field]).astype(np.float32)
+
+                frb = proj.frb
+                image = np.array(frb[field[0], field[1]])
 
             elif plot_type.lower() == "slice":
 
@@ -1431,8 +1460,11 @@ class VisualizationManager:
                                    width=width,
                                    buff_size=(self.buff_size, self.buff_size))
 
-                frb = slc.data_source.to_frb(width, self.buff_size)
-                image = np.array(frb[field]).astype(np.float32)
+                #frb = slc.data_source.to_frb(width, self.buff_size)
+                #image = np.array(frb[field]).astype(np.float32)
+
+                frb = slc.frb
+                image = np.array(frb[field[0], field[1]])
 
             else:
                 raise ValueError("plot_type must be 'projection' or 'slice'")
@@ -1447,11 +1479,37 @@ class VisualizationManager:
             if lims_dict is not None:
                 lims = lims_dict.get(field)
 
+            # Clip non-positive values to avoid log of zero or negative numbers
+            if np.min(image) <= 0:
+                print('Warning: Data contains non-positive values. Adjusting ' +
+                      'for LogNorm.')
+
+                # Clip values below 1e-10
+                image = np.clip(image, a_min=1e-10, a_max=None)
+
+            # Replace NaN with 0 and Inf with finite numbers
+            if np.any(np.isnan(image)) or np.any(np.isinf(image)):
+                print('Warning: Data contains NaN or Inf values. ' +
+                      'Replacing with 0.')
+                image = np.nan_to_num(image)
+
+            # Set the extent of the plot
+            extent_dens = [-lbox/2, lbox/2, -lbox/2, lbox/2]
+
+            # Define the color normalization based on the range of the data
+            # Viridis, Inferno, Magma maps work - perceptually uniform
             norm = self.get_norm(image, lims=lims, log=log)
 
-            im = ax.imshow(image,
-                           origin="lower",
-                           norm=norm)
+            im = ax.imshow(image, norm=norm, extent=extent_dens, 
+                            origin='lower', aspect='equal', 
+                            interpolation='nearest', cmap='viridis')
+
+            ax.set_xlim(-lbox/2, lbox/2)
+            ax.set_ylim(-lbox/2, lbox/2)
+
+            #im = ax.imshow(image,
+            #               origin="lower",
+            #               norm=norm)
 
             cbar = fig.colorbar(im, ax=ax)
             #cbar.set_label(field[1])
@@ -1465,6 +1523,7 @@ class VisualizationManager:
             #------------------------------------------
             # Save FITS per panel
             #------------------------------------------
+
             panel_path = os.path.join(self.directory, 'panel_plots')
             fits_path = os.path.join(panel_path, 'panel_fits')
 
@@ -1473,10 +1532,13 @@ class VisualizationManager:
             if not os.path.exists(fits_path):
                 os.makedirs(fits_path)
 
+            plot_title = f'{self.output_file}_{lbox}{length_unit}_' + \
+                f'{filename}'
+
             if self.minimal_output is False:
                 self.write_fits_image(
                     image,
-                    f"{fits_path}/{filename}_{field[1]}.fits",
+                    f"{fits_path}/{plot_title}_{field[1]}.fits",
                     field=str(field),
                     width=width,
                     center=center,
@@ -1488,9 +1550,10 @@ class VisualizationManager:
             ax.axis("off")
 
         fig.tight_layout()
-        fig.savefig(f"{panel_path}/{filename}.pdf", dpi=300)
         if self.minimal_output is False:
-            fig.savefig(f"{panel_path}/{filename}.png", dpi=300)
+            fig.savefig(f"{panel_path}/{plot_title}.pdf", dpi=300)
+
+        fig.savefig(f"{panel_path}/{plot_title}.png", dpi=300)
         plt.close(fig)
 
         return images
