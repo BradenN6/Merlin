@@ -3,6 +3,8 @@ import re
 import ffmpeg
 import glob
 
+# pip install ffmpeg-python
+
 def make_animation(image_pattern, output_file, framerate=2, resolution=(1920, 1080)):
     '''
     Creates video from a sequence of images
@@ -29,8 +31,18 @@ lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3
        "Ne3_3967.47A","N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
 #image_dir = '/Users/bnowicki/Documents/Scratch/movie_dir_stellar_dist_2/'
-image_dir = '/Users/bnowicki/Documents/Scratch/analysis_fid/maindir/'
+#image_dir = '/Users/bnowicki/Documents/Scratch/analysis_fid/maindir/'
+image_dir = '/Users/bnowicki/Research/Ricotti/fiducial-analysis/movie-dir/'
 image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_lims',
+                  'output_*_1500pc_electron_number_density_proj_lims',
+                  'output_*_1500pc_my_H_nuclei_density_proj_lims',
+                  'output_*_1500pc_my_He_number_density_proj_lims',
+                  'output_*_1500pc_my_temperature_proj_lims',
+                  'output_*_1500pc_OII_ratio_proj_lims',
+                  'output_*_1500pc_OIII_ratio_proj_lims',
+                  'output_*_1500pc_panel_envi_2_lims',
+                  'output_*_1500pc_panel_envi_lims',
+                  'output_*_1500pc_panel_envi_lims',
                   'output_*_1500pc_ion-param_proj', 'output_*_1500pc_ion-param_proj_lims',
                   'output_*_1500pc_luminosity_H1_6562,80A_proj', 'output_*_1500pc_flux_H1_6562,80A_slc',
                   'output_*_1500pc_metallicity_proj', 'output_*_1500pc_metallicity_proj_lims',
@@ -44,6 +56,7 @@ image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_
                   'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase_profile',
                   'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase',
                   'output_*_1500pc_stellar_dist', #'output_*_1500pc_stellar_dist_H1']
+                  'output_*_1500pc_stellar_distflux_H1_6562.80A',
                   'output_*_my_H_nuclei_density_proj', 'output_*_my_H_nuclei_density_proj_lims',
                   'output_*_my_temperature_proj', 'output_*_my_temperature_proj_lims',
                   'output_*_OII_ratio_proj', 'output_*_OII_ratio_proj_lims',
@@ -51,6 +64,18 @@ image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_
                   'output_*_xHII_proj', 'output_*_xHII_proj_lims',
                   'output_*_xHeII_proj', 'output_*_xHeII_proj_lims',
                   'output_*_xHeIII_proj', 'output_*_xHeIII_proj_lims',
+                  'output_*_my_temperature_electron_number_density_flux_C3_1906.68A_phase_profile',
+                  'output_*_my_temperature_electron_number_density_flux_C3_1906.68A_phase',
+                  'output_*_my_temperature_electron_number_density_flux_H1_6562.80A_phase_profile',
+                  'output_*_my_temperature_electron_number_density_flux_H1_6562.80A_phase',
+                  'output_*_my_temperature_electron_number_density_flux_O2_3728.80A_phase_profile',
+                  'output_*_my_temperature_electron_number_density_flux_O2_3728.80A_phase',
+                  'output_*_my_temperature_electron_number_density_mass_phase_profile',
+                  'output_*_my_temperature_electron_number_density_mass_phase',
+                  'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase_profile',
+                  'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase',
+                  'output_*_my_temperature_my_H_nuclei_density_mass_phase_profile',
+                  'output_*_my_temperature_my_H_nuclei_density_mass_phase',
                   'output_*_flux_H1_6562.80A_cumulative']
 
 

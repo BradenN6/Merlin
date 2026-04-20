@@ -45,7 +45,7 @@ star_ctr = viz.star_center(ad)
 sp = ds.sphere(star_ctr, (3000, "pc"))
 sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
 sp_small = ds.sphere(star_ctr, (1500, "pc"))
-sp_tiny = ds.sphere(star_ctr, (500, "pc"))
+sp_tiny = ds.sphere(star_ctr, (200, "pc"))
 width = (1500, 'pc')
 
 print(star_ctr)
@@ -187,10 +187,10 @@ plt.text(0.95, 0.95, f'z = {ds.current_redshift:.5f}', color='black',
          fontsize=9, ha='right', va='top',
          transform=plt.gca().transAxes)
 
-plt.title("Number Density and Temperature PDFs (1.5 kpc sphere region)", fontsize=13, pad=14)
+plt.title("Number Density and Temperature PDFs (200 pc sphere region)", fontsize=13, pad=14)
 plt.tight_layout()
 
-outfile = "output_00389_ramses_pdfs_500pc.pdf"
+outfile = "output_00389_ramses_pdfs_200pc.pdf"
 plt.savefig(outfile, dpi=150, bbox_inches="tight")
 print(f"Saved → {outfile}")
 plt.show()
