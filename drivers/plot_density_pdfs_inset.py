@@ -373,9 +373,9 @@ if __name__ == "__main__":
         density_range = (1e-4, 1e4),       # cm^-3
         temp_range    = (10,   1e8),        # K
         inset_density_ranges = [
-            (1e-1, 1e1,  "warm neutral"),
-            (1e1, 1e2, "intermediate"),
-            (1e2,  1e4,  "dense gas"),
+        #   (1e-1, 1e1,  "warm neutral"),
+        #    (1e1, 1e2, "intermediate"),
+        #    (1e2,  1e4,  "dense gas"),
         ],
         n_bins        = 120,
         outfile       = "ramses_pdfs.pdf",

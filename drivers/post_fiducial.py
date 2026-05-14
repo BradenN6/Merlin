@@ -16,16 +16,21 @@ Authors: Braden Marazzo-Nowicki, Massimo Ricotti
 # Directory containing analysis infofile output from many time slices
 # must end in /
 #path = '/Users/bnowicki/Research/Scratch/Ricotti/analysis_fid/maindir/'
-path = '/Users/bnowicki/Research/Ricotti/fiducial-analysis/infofile-dir/'
+path = '/Users/bnowicki/Research/Ricotti/fiducial-analysis/analysis-list2/infofile-dir/'
 
-lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+#lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+#       "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
+#       "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
+#       "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
+#       "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
+lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
        "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
        "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
        "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
        "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
 # Create Simulation_Post_Analysis object and populate a csv
-simpost = merlin_spectra.SimulationPostAnalysis('CC-Fiducial-03', path, lines)
+simpost = merlin_spectra.SimulationPostAnalysis('CC-Fiducial-list2', path, lines)
 
 df = simpost.populate_table()
 
@@ -34,7 +39,7 @@ print(df.shape)
 
 print(df.columns.tolist())
 
-df_path = os.path.join(os.getcwd(), "CC-Fiducial-03_post_analysis/analysis_data.csv")
+df_path = os.path.join(os.getcwd(), "CC-Fiducial-list2_post_analysis/analysis_data.csv")
 df = pd.read_csv(df_path)
 
 lines_plot = lines

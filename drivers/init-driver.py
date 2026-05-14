@@ -57,14 +57,23 @@ ramses_dir = "/scratch/zt1/project/ricotti-prj/user/ricotti/GC-Fred/CC-Fiducial"
 print(f'RAMSES-RT Data Filepath = {filename}')
 
 # List of lines in Cloudy Table
-lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+#lines=["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
+#       "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
+#       "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
+#       "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
+#       "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
+lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
        "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
        "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
        "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
        "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
 
 # Associated wavelengths
-wavelengths=[6562.80, 4861.35, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81, 
+#wavelengths=[6562.80, 4861.35, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81, 
+#             1666.15, 4363.21, 4958.91, 5006.84, 1640.41, 1335.66, 1906.68, 
+#             1908.73, 1549.00, 2795.53, 2802.71, 3868.76, 3967.47, 1238.82, 
+#             1242.80, 1486.50, 1749.67, 6716.44, 6730.82]
+wavelengths=[6562.80, 1304.86, 6300.30, 3728.80, 3726.10, 1660.81, 
              1666.15, 4363.21, 4958.91, 5006.84, 1640.41, 1335.66, 1906.68, 
              1908.73, 1549.00, 2795.53, 2802.71, 3868.76, 3967.47, 1238.82, 
              1242.80, 1486.50, 1749.67, 6716.44, 6730.82]
@@ -376,8 +385,9 @@ else:
 
 # To use a line list in the merlin package source----
 # NOTE: linelist-all.dat updated to include HBeta
+# Something strange with [OIII] luminosity in linelist-all.dat
 emission_interpolator = merlin.EmissionLineInterpolator(lines, filename=None,
-                 use_import=True, linelist_name="linelist-all.dat")
+                 use_import=True, linelist_name="linelist2.dat")
 
 # Add flux and luminosity fields for all lines in the list
 for i, line in enumerate(lines):
@@ -540,14 +550,16 @@ viz = merlin.VisualizationManager(filename, ramses_dir, logSFC_path, lines, wave
 star_ctr = viz.star_center(ad)
 sp = ds.sphere(star_ctr, (3000, "pc"))
 sp_lum = ds.sphere(star_ctr, (10, 'kpc'))
+sp_galaxy = ds.sphere(star_ctr, (300, 'pc'))
 width = (1500, 'pc')
 
 print(star_ctr)
 
 # Save Simulation Information
-#viz.save_sim_info()
-#viz.calc_luminosities(sp_lum)
-#viz.save_sim_field_info(sp)
+viz.save_sim_info()
+viz.calc_luminosities(sp_lum)
+viz.save_sim_field_info(sp)
+viz.save_sim_field_info(sp_galaxy, file_title='300pc')
 
 #-----------------------------
 # Projection/Slice Plots
@@ -612,8 +624,8 @@ title_list = [
 for line in lines:
     if line == 'H1_6562.80A':
         line_title = r'H$\alpha$_6562.80A'
-    elif line == 'H1_4861.35A':
-        line_title = r'H$\beta$_4861.35A'
+    #elif line == 'H1_4861.35A':
+    #    line_title = r'H$\beta$_4861.35A'
     else:
         line_title = line
 
@@ -623,9 +635,9 @@ for line in lines:
     weight_field_list.append(None)
 
 
-#viz.plot_wrapper(sp, width, star_ctr, field_list,
-#                     weight_field_list, title_list, proj=True, slc=False,
-#                     lims_dict=lims_fiducial_00319)
+viz.plot_wrapper(sp, width, star_ctr, field_list,
+                     weight_field_list, title_list, proj=True, slc=False,
+                     lims_dict=lims_fiducial_00319)
 
 #viz.plot_wrapper(sp, width, star_ctr, field_list,
 #                    weight_field_list, title_list, proj=True, slc=False,
@@ -762,7 +774,7 @@ viz.phase_plot_wrapper(sp, phase_config_list)
 #-----------------------------
 
 # TODO self.current_redshift
-#viz.spectra_driver(1000, 1e-25)
+viz.spectra_driver(1000, 1e-25)
 # TODO lum_lims
 
 #line_title = r'H$\alpha$_6562.80A'
@@ -772,11 +784,11 @@ viz.phase_plot_wrapper(sp, phase_config_list)
 #-----------------------------
 
 # Cumulative Flux Plot
-#viz.plot_cumulative_field(sp, [('gas', 'flux_H1_6562.80A')],
-#                          r'H$\alpha$_6562.80A'.replace('_', ' ') + 
-#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]',
-#                            'flux_H1_6562.80A_cumulative',
-#                            (0,1000))
+viz.plot_cumulative_field(sp, [('gas', 'flux_H1_6562.80A')],
+                          r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]',
+                            'flux_H1_6562.80A_cumulative',
+                            (0,1000))
 
 
 # TODO all 'Projected'
@@ -964,23 +976,17 @@ panel_config_line_emission_4_alt = [
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
 ]
 
-lines = ["H1_6562.80A","H1_4861.35A","O1_1304.86A","O1_6300.30A","O2_3728.80A",
-       "O2_3726.10A","O3_1660.81A","O3_1666.15A","O3_4363.21A","O3_4958.91A",
-       "O3_5006.84A","He2_1640.41A","C2_1335.66A","C3_1906.68A","C3_1908.73A",
-       "C4_1549.00A","Mg2_2795.53A","Mg2_2802.71A","Ne3_3868.76A","Ne3_3967.47A",
-       "N5_1238.82A","N5_1242.80A","N4_1486.50A","N3_1749.67A","S2_6716.44A","S2_6730.82A"]
-
 panel_config_line_emission_all = [
     {'field': ('gas', 'flux_H1_6562.80A'),
      'plot_type': 'projection',
      'weight_field': ('gas', 'my_H_nuclei_density'),
      'title': r'H$\alpha$_6562.80A'.replace('_', ' ') + 
                       r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
-     {'field': ('gas', 'flux_H1_4861.35A'),
-     'plot_type': 'projection',
-     'weight_field': ('gas', 'my_H_nuclei_density'),
-     'title': r'H$\beta$_4861.35A'.replace('_', ' ') + 
-                      r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
+     #{'field': ('gas', 'flux_H1_4861.35A'),
+     #'plot_type': 'projection',
+     #'weight_field': ('gas', 'my_H_nuclei_density'),
+     #'title': r'H$\beta$_4861.35A'.replace('_', ' ') + 
+     #                 r' Flux [erg s$^{-1}$ cm$^{-2}$]'},
 ]
 
 # not quite all, skipping O1 1304
@@ -1005,11 +1011,11 @@ for line in lines[3::]:
 #viz.panel_plot(sp, panel_config_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_line_ratios')
 #viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios')
 #viz.panel_plot(sp, panel_config_line_emission_4, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4')
-viz.panel_plot(sp, panel_config_line_emission_4_alt, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_alt')
+#viz.panel_plot(sp, panel_config_line_emission_4_alt, width, star_ctr, nrows=2, ncols=2, filename='panel_line_emission_4_alt')
 #viz.panel_plot(sp, panel_config_line_emission_all, width, star_ctr, nrows=5, ncols=5, filename='panel_line_emission_all')
 
-#viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi_lims', lims_dict=lims_fiducial_00319)
-#viz.panel_plot(sp, panel_config_envi_2, width, star_ctr, nrows=2, ncols=5, filename='panel_envi_2_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_envi, width, star_ctr, nrows=2, ncols=3, filename='panel_envi_lims', lims_dict=lims_fiducial_00319)
+viz.panel_plot(sp, panel_config_envi_2, width, star_ctr, nrows=2, ncols=5, filename='panel_envi_2_lims', lims_dict=lims_fiducial_00319)
 #viz.panel_plot(sp, panel_config_ion_fracs, width, star_ctr, nrows=2, ncols=2, filename='panel_ion_fracs_lims', lims_dict=lims_fiducial_00319)
 #viz.panel_plot(sp, panel_config_eden_line_ratios, width, star_ctr, nrows=2, ncols=2, filename='panel_eden_line_ratios_lims', lims_dict=lims_fiducial_00319)
 #viz.panel_plot(sp, panel_config_temp_line_ratios, width, star_ctr, nrows=1, ncols=3, filename='panel_temp_line_ratios_lims', lims_dict=lims_fiducial_00319)
@@ -1020,12 +1026,19 @@ viz.panel_plot(sp, panel_config_line_emission_4_alt, width, star_ctr, nrows=2, n
 
 
 # Stellar Density
-#viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
-#                    r'H$\alpha$_6562.80A'.replace('_', ' ') + 
-#                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=True,
-#                            lims_dict=lims_fiducial_00319)
+viz.star_gas_overlay(sp, star_ctr, width, ('gas', 'flux_H1_6562.80A'),
+                    r'H$\alpha$_6562.80A'.replace('_', ' ') + 
+                            r' Flux [erg s$^{-1}$ cm$^{-2}$]', gas_flag=True,
+                            lims_dict=lims_fiducial_00319)
 
-
+fig, ax_bot, ax_top = viz.plot_density_pdfs(
+    sp_galaxy,
+    redshift=ds.current_redshift,
+    title=None,
+    outfile_tag="300pc",
+    density_range=(1e-3, 10**4.5),   # cm^-3  — omit to auto-scale
+    temp_range=(10**2.5, 10**7.5),         # K      — omit to auto-scale
+)
 
 
 

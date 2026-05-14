@@ -84,7 +84,8 @@ class EmissionLineInterpolator:
             self.ll = np.loadtxt(self.filename, unpack=True, dtype=float, 
                                 skiprows=7)
         else:
-            resource = files("merlin_spectra") / "linelists" / "linelist-all.dat"
+            #resource = files("merlin_spectra") / "linelists" / "linelist-all.dat"
+            resource = files("merlin_spectra") / "linelists" / self.linelist_name
 
             # path exists within the with block
             with as_file(resource) as path:

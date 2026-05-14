@@ -16,6 +16,7 @@ from scipy.ndimage import gaussian_filter
 from matplotlib.gridspec import GridSpec
 from astropy.io import fits
 from typing import Optional, Tuple, List, Dict
+import matplotlib.ticker as ticker
 
 '''
 galaxy_visualization.py
@@ -590,7 +591,7 @@ class VisualizationManager:
             shutil.copy2(sim_info_file, self.directory)
 
 
-    def save_sim_field_info(self, sp, ad=None):
+    def save_sim_field_info(self, sp, ad=None, file_title=None):
         '''
         Save min, max, mean, and aggregate of each field in fields array
         within a sphere sp.
@@ -600,6 +601,8 @@ class VisualizationManager:
         sp : data sphere object
         ad : alldata object
             Optionally specify; otherwise, use object-stored ad.
+        file_title : string
+            Optionally specify an additional name for the file
         '''
 
         if ad is None:
@@ -646,8 +649,12 @@ class VisualizationManager:
             field_info.append((min, max, mean, agg))
 
         # Save data to a file
-        file_path = os.path.join(self.directory, 
+        if file_title is None:
+            file_path = os.path.join(self.directory, 
                                 f'{self.output_file}_field_info.txt')
+        else:
+            file_path = os.path.join(self.directory, 
+                                f'{self.output_file}_field_info_{file_title}.txt')
         
         stellar_mass = \
             ad.quantities.total_quantity(('star', 'particle_mass')).to("Msun") #.value
@@ -1783,7 +1790,311 @@ class VisualizationManager:
         return x_range, y_vals
     
 
+    #------------------------------------------------
+    # Density and Temperature PDFs
+    #------------------------------------------------
+
+    # ---------------------------------------------------------------------------
+    # Private helpers
+    # ---------------------------------------------------------------------------
+
+    def _positive_log_bins(self, arr, n_bins=100):
+        """Return log-spaced bin edges covering the positive values of *arr*."""
+        arr = arr[arr > 0]
+        return np.logspace(np.log10(arr.min()), np.log10(arr.max()), n_bins + 1)
+
+
+    def _normalised_hist(self, arr, bins):
+        """
+        Return bin centres and PDF values normalised so that the maximum equals 1
+        (probability relative to the mode, not a true density).
+
+        Empty bins are dropped so centres never contain NaN or Inf.
+
+        Parameters
+        ----------
+        arr : array-like
+            Raw data values (may contain non-positive or non-finite entries).
+        bins : array-like
+            Log-spaced bin edges (as returned by `_positive_log_bins`).
+
+        Returns
+        -------
+        centres : ndarray
+            Geometric bin centres for non-empty bins.
+        pdf : ndarray
+            Peak-normalised counts (values in [0, 1]).
+        """
+        arr = np.asarray(arr)
+        arr = arr[np.isfinite(arr) & (arr > 0)]
+        if arr.size == 0:
+            raise ValueError(
+                "Array has no finite positive values — cannot build histogram."
+            )
+        log_bins = np.log10(bins)
+        counts, edges = np.histogram(np.log10(arr), bins=log_bins)
+        centres = 10 ** (0.5 * (edges[:-1] + edges[1:]))
+
+        # Drop empty bins
+        mask = counts > 0
+        centres = centres[mask]
+        counts  = counts[mask]
+
+        return centres, counts / counts.max()
+
+    # API
+    def plot_density_pdfs(
+        self,
+        region,
+        *,
+        n_e_field=("gas", "electron_number_density"),
+        n_H_field=("gas", "my_H_nuclei_density"),
+        T_field=("gas", "my_temperature"),
+        n_bins_density=100,
+        n_bins_T=100,
+        density_range=None,
+        temp_range=None,
+        redshift=None,
+        title="Number Density and Temperature PDFs",
+        outfile_tag=None,
+        dpi=150,
+        colors=None,
+        figsize=(8, 5),
+        ax=None,
+    ):
+        """
+        Plot peak-normalised PDFs for electron density, H nuclei density, and
+        temperature extracted from a yt region (sphere, box, etc.).
+
+        Density fields share the **bottom** x-axis (cm⁻³, log scale).
+        The temperature field uses a **top** x-axis (K, log scale).
+        All three share the same y-axis (relative probability, 0–1).
+
+        Parameters
+        ----------
+        region : yt data object
+            Any yt region that supports field indexing (sphere, box, …).
+        n_e_field : tuple, optional
+            yt field specifier for electron number density (cm⁻³).
+        n_H_field : tuple, optional
+            yt field specifier for H nuclei number density (cm⁻³).
+        T_field : tuple, optional
+            yt field specifier for temperature (K).
+        n_bins_density : int, optional
+            Number of histogram bins for density fields.
+        n_bins_T : int, optional
+            Number of histogram bins for temperature.
+        density_range : tuple(float, float) or None, optional
+            Fixed (min, max) limits in cm⁻³ for the density bin edges **and**
+            the bottom x-axis.  Data outside this range is excluded before
+            histogramming.  If ``None``, limits are derived from the data.
+            Example: ``density_range=(1e-4, 1e4)``.
+        temp_range : tuple(float, float) or None, optional
+            Fixed (min, max) limits in K for the temperature bin edges **and**
+            the top x-axis.  Data outside this range is excluded before
+            histogramming.  If ``None``, limits are derived from the data.
+            Example: ``temp_range=(10, 1e8)``.
+        redshift : float or None, optional
+            If provided, annotated in the top-right corner.
+            Pass ``ds.current_redshift`` directly.
+        title : str, optional
+            Figure title.
+        outfile_tag : str or None, optional
+            If given, the figure is saved to a filepath with this tag.
+        dpi : int, optional
+            Resolution used when saving.
+        colors : dict or None, optional
+            Override default colours.  Recognised keys:
+            ``"electron"``, ``"hydrogen"``, ``"temperature"``.
+        figsize : tuple, optional
+            ``(width, height)`` in inches (ignored when *ax* is supplied).
+        ax : matplotlib.axes.Axes or None, optional
+            Bottom axes to draw into.  If ``None``, a new figure is created.
+            Supplying an existing axes lets you embed the plot in a larger layout.
+
+        Returns
+        -------
+        fig : matplotlib.figure.Figure
+        ax_bot : matplotlib.axes.Axes   (bottom / density axis)
+        ax_top : matplotlib.axes.Axes   (top / temperature axis)
+        """
+
+        # --- defaults --------------------------------------------------------
+        _colors = {
+            "electron":    "#E05C3A",   # warm orange-red
+            "hydrogen":    "#3A7FE0",   # sky blue
+            "temperature": "#2EBF91",   # teal-green
+        }
+        if colors:
+            _colors.update(colors)
+
+        # --- extract data ----------------------------------------------------
+        n_e = np.array(region[n_e_field])
+        n_H = np.array(region[n_H_field])
+        T   = np.array(region[T_field])
+
+        # --- apply optional range clipping -----------------------------------
+        # Clipping is done before binning so that bin edges span exactly the
+        # requested range and the histogram only counts in-range data.
+        def _clip_positive(arr, range_tuple):
+            """Keep only finite positive values within (lo, hi) if given."""
+            mask = np.isfinite(arr) & (arr > 0)
+            if range_tuple is not None:
+                lo, hi = range_tuple
+                mask &= (arr >= lo) & (arr <= hi)
+            return arr[mask]
+
+        n_e_clipped = _clip_positive(n_e, density_range)
+        n_H_clipped = _clip_positive(n_H, density_range)
+        T_clipped   = _clip_positive(T,   temp_range)
+
+        # --- bin edges -------------------------------------------------------
+        # If a range was supplied, use it directly for the bin edges so that
+        # bins span the full requested interval even if no data sits at the edges.
+        def _make_bins(arr_clipped, range_tuple, n_bins):
+            if range_tuple is not None:
+                lo, hi = range_tuple
+                return np.logspace(np.log10(lo), np.log10(hi), n_bins + 1)
+            return self._positive_log_bins(arr_clipped, n_bins)
+
+        bins_e = _make_bins(n_e_clipped, density_range, n_bins_density)
+        bins_H = _make_bins(n_H_clipped, density_range, n_bins_density)
+        bins_T = _make_bins(T_clipped,   temp_range,    n_bins_T)
+
+        # --- histograms ------------------------------------------------------
+        centres_e, pdf_e = self._normalised_hist(n_e_clipped, bins_e)
+        centres_H, pdf_H = self._normalised_hist(n_H_clipped, bins_H)
+        centres_T, pdf_T = self._normalised_hist(T_clipped,   bins_T)
+
+        # Diagnostics
+        print(f"n_e : min={n_e_clipped.min():.3e}, max={n_e_clipped.max():.3e}, N={n_e_clipped.size} (of {n_e.size} total)")
+        print(f"n_H : min={n_H_clipped.min():.3e}, max={n_H_clipped.max():.3e}, N={n_H_clipped.size} (of {n_H.size} total)")
+        print(f"T   : min={T_clipped.min():.3e},  max={T_clipped.max():.3e},  N={T_clipped.size} (of {T.size} total)")
+
+        # --- figure / axes setup ---------------------------------------------
+        if ax is None:
+            fig, ax_bot = plt.subplots(figsize=figsize)
+        else:
+            ax_bot = ax
+            fig = ax_bot.figure
+
+        # --- density curves (bottom x-axis) ----------------------------------
+        ax_bot.step(
+            centres_e, pdf_e,
+            where="mid",
+            color=_colors["electron"],
+            linestyle="-",
+            linewidth=1.8,
+            label=r"$n_e$  (electron)",
+        )
+        ax_bot.step(
+            centres_H, pdf_H,
+            where="mid",
+            color=_colors["hydrogen"],
+            linestyle="--",
+            linewidth=1.8,
+            label=r"$n_\mathrm{H}$  (H nuclei)",
+        )
+
+        ax_bot.set_xscale("log")
+        ax_bot.set_xlabel(r"Number density  $[\mathrm{cm}^{-3}]$", fontsize=12)
+        ax_bot.set_ylabel("Relative probability  (normalised to peak)", fontsize=11)
+        ax_bot.set_ylim(0, 1.05)
+        ax_bot.yaxis.set_major_locator(ticker.MultipleLocator(0.2))
+        ax_bot.yaxis.set_minor_locator(ticker.MultipleLocator(0.05))
+
+        all_n = np.concatenate([centres_e, centres_H])
+        all_n = all_n[np.isfinite(all_n) & (all_n > 0)]
+        if all_n.size == 0:
+            raise ValueError(
+                "No finite positive bin centres for density fields — "
+                "check that n_e and n_H contain valid positive values."
+            )
+        if density_range is not None:
+            ax_bot.set_xlim(density_range[0], density_range[1])
+        else:
+            ax_bot.set_xlim(all_n.min() * 0.5, all_n.max() * 2)
+
+        # --- temperature curve (top x-axis) ----------------------------------
+        ax_top = ax_bot.twiny()
+
+        ax_top.step(
+            centres_T, pdf_T,
+            where="mid",
+            color=_colors["temperature"],
+            linestyle=":",
+            linewidth=2.0,
+            label=r"$T$  (temperature)",
+        )
+
+        ax_top.set_xscale("log")
+        ax_top.set_xlabel(
+            r"Temperature  $[\mathrm{K}]$",
+            fontsize=12,
+            color=_colors["temperature"],
+        )
+        ax_top.tick_params(axis="x", colors=_colors["temperature"])
+        ax_top.spines["top"].set_edgecolor(_colors["temperature"])
+
+        if temp_range is not None:
+            ax_top.set_xlim(temp_range[0], temp_range[1])
+        else:
+            ax_top.set_xlim(T_clipped.min() * 0.5, T_clipped.max() * 2)
+
+        # --- unified legend --------------------------------------------------
+        lines_bot, labels_bot = ax_bot.get_legend_handles_labels()
+        lines_top, labels_top = ax_top.get_legend_handles_labels()
+        ax_bot.legend(
+            lines_bot + lines_top,
+            labels_bot + labels_top,
+            loc="upper left",
+            framealpha=0.85,
+            fontsize=10,
+        )
+
+        # --- grid ------------------------------------------------------------
+        ax_bot.grid(True, which="major", linestyle="--", linewidth=0.5, alpha=0.4)
+        ax_bot.grid(True, which="minor", linestyle=":",  linewidth=0.3, alpha=0.25)
+
+        # --- optional redshift annotation ------------------------------------
+        if redshift is not None:
+            ax_bot.text(
+                0.95, 0.95,
+                f"z = {redshift:.5f}",
+                color="black",
+                fontsize=9,
+                ha="right",
+                va="top",
+                transform=ax_bot.transAxes,
+            )
+
+        # --- title and layout ------------------------------------------------
+        fig.suptitle(title, fontsize=13, y=1.02)
+        fig.tight_layout()
+
+        # --- save ---------------------------------------------------
+        if outfile_tag is None:
+            plot_title = f'{self.output_file}_nTPDFS'
+        else:
+            plot_title = f'{self.output_file}_nTPDFS_{outfile_tag}'
+
+        plt_path = os.path.join(self.directory, 'pdfs')
+        if not os.path.exists(plt_path):
+            os.makedirs(plt_path)
+
+        fname = os.path.join(plt_path, plot_title)
+
+        fig.savefig(fname, dpi=dpi, bbox_inches="tight")
+        print(f"Saved → {fname}")
+
+        return fig, ax_bot, ax_top
+
+
+
+
+
+
+    
+
 # Lims Dict in Class
 # TODO consistent fontsize
-
-# TODO change panel plot frb approach
