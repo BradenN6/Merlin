@@ -32,7 +32,8 @@ lines=["H1_6562.80A","O1_1304.86A","O1_6300.30A","O2_3728.80A","O2_3726.10A","O3
 
 #image_dir = '/Users/bnowicki/Documents/Scratch/movie_dir_stellar_dist_2/'
 #image_dir = '/Users/bnowicki/Documents/Scratch/analysis_fid/maindir/'
-image_dir = '/Users/bnowicki/Research/Ricotti/fiducial-analysis/movie-dir/'
+#image_dir = '/Users/bnowicki/Research/Ricotti/fiducial-analysis/movie-dir/'
+image_dir = '/Users/bnowicki/Research/Ricotti/fiducial-analysis/analysis-list2/movie-dir/'
 image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_lims',
                   'output_*_1500pc_electron_number_density_proj_lims',
                   'output_*_1500pc_my_H_nuclei_density_proj_lims',
@@ -76,7 +77,8 @@ image_patterns = ['output_*_1500pc_density_proj', 'output_*_1500pc_density_proj_
                   'output_*_my_temperature_my_H_nuclei_density_flux_H1_6562.80A_phase',
                   'output_*_my_temperature_my_H_nuclei_density_mass_phase_profile',
                   'output_*_my_temperature_my_H_nuclei_density_mass_phase',
-                  'output_*_flux_H1_6562.80A_cumulative']
+                  'output_*_flux_H1_6562.80A_cumulative',
+                  'output_*_nTPDFS_300pc']
 
 
 
