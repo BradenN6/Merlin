@@ -15,7 +15,7 @@ file_path = "analysis_data.csv"
 df = pd.read_csv(file_path)
 
 # Truncate to output_id >= 304 (redshift <= 9.952258...)
-df = df[df["output_id"] >= 304].reset_index(drop=True)
+#df = df[df["output_id"] >= 304].reset_index(drop=True)
 
 
 z=np.array(df["current_redshift"])
@@ -126,9 +126,9 @@ ax2 = ax1.twinx()
 
 # Plot density and temperature on the secondary y-axis
 #ax2.plot(df.current_redshift, density/1.6e-24, 'g--', label='Density (mean)')
-ax2.plot(df.current_redshift, edensity, 'g--', label='Density (mean)')
+ax2.plot(df.current_redshift, edensity**2, 'g--', label='Density (mean)')
 ax2.plot(df.current_redshift, temperature, 'r-.', label='Temperature (mean)')
-ax2.set_ylabel(r"Electro Number Density [cm$^{-3}$], Temperature [K]", color='k')
+ax2.set_ylabel(r"Squared Electron Number Density [cm$^{-6}$], Temperature [K]", color='k')
 ax2.tick_params(axis='y', labelcolor='k')
 ax2.set_yscale('log')
 

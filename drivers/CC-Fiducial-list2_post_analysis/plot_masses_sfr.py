@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 file_path = "analysis_data.csv"
 df = pd.read_csv(file_path)
 # Truncate to output_id >= 304 (redshift <= 9.952258...)
-df = df[df["output_id"] >= 304].reset_index(drop=True)
+#df = df[df["output_id"] >= 304].reset_index(drop=True)
 
 redshift     = np.array(df["current_redshift"])
 stellar_mass = np.array(df["Stellar_Mass_Msun"])
