@@ -1,0 +1,13 @@
+current_time: 0.5805966748321958 Gyr
+domain_dimensions: [32 32 32]
+domain_left_edge: [0. 0. 0.] code_length
+domain_right_edge: [1. 1. 1.] code_length
+cosmological_simulation: True
+current_redshift: 8.837022085412425
+omega_lambda: 0.730000019073486
+omega_matter: 0.270000010728836
+omega_radiation: 0.0
+hubble_constant: 0.7
+sfr_10: 0.04201914040255171 Msun
+sfr_5: 0.07251089538181467 Msun
+sfr_1: 0.04641363099970481 Msun
